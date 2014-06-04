@@ -1,4 +1,4 @@
-# Sage: Open Source Mathematical Software
+# Sage: Open Source Mathematical Software (Game Theory Dev Repo)
 
 > "Creating a Viable Open Source Alternative to
 >     Magma, Maple, Mathematica, and MATLAB"
