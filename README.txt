@@ -16,7 +16,6 @@ Sage. Please see the following web page for a list:
 In many cases, documentation for modules and functions list the
 authors.
 
-
 **This is the working repository for game theoretical development in Sage. For the main Sage repository see https://github.com/sagemath/sage. **
 
 The current open tickets for game theory can be found (which correspond to branches in this repository) below:
