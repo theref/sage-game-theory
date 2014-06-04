@@ -1,2 +1,0 @@
-The Homset constructor base extends the codomain to a new ring,
-so that the codomain is no longer the scheme of interest.

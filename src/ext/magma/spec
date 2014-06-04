@@ -1,9 +1,0 @@
-latex
-{
-   +latex.spec
-}
-
-sage
-{
-   +sage.spec
-}
