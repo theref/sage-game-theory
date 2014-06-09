@@ -32,6 +32,6 @@ Current contributors:
 - Vincent Knight (Cardiff)
 
 
-In order to use some of our code, you must have Gambit installed within Sage. After cloning this repo, download the tarball file from [here](http://sourceforge.net/projects/gambit/files/gambit13/).
+In order to use some of our code, you must have Gambit installed within Sage. After cloning this repo (**do not pull the readme branch**), download the tarball file from [here](http://sourceforge.net/projects/gambit/files/gambit13/).
 Move the tarball to ``SAGE_ROOT/upstream/`` and then from ``SAGE_ROOT`` run ``sage -i package_name``.
 You should now be able to ``import gambit`` from within sage.
