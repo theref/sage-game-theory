@@ -485,6 +485,10 @@ Here is an example with the trivial game where all payoffs are 0::
 
 A good description of degenerate games can be found in [NN2007]_.
 
+Several standard Normal Form Games have also been implemented.
+For more information on how to access these, see: :mod:`Game Theory Catalog<sage.game_theory.catalog>`.
+Included is information on the situation each Game models.
+
 REFERENCES:
 
 .. [N1950] John Nash.
