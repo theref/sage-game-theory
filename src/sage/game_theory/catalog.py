@@ -1,7 +1,7 @@
 """
 Documentation for the game theory catalog
 """
-from sage.game_theory import NormalFormGame
+from sage.game_theory.normal_form_game import NormalFormGame
 from sage import matrix
 
 def PrisonersDilemma():

@@ -6,4 +6,4 @@ literature. A list of all Normal Form Games in this database is available via ta
 completion. Type ``NormalFormGame.`` (include the last dot) and hit
 the ``tab`` key to see which Normal Form Games are available.
 """
-from sage.NormalFormGame.catalog import *
+from sage.game_theory.catalog import PrisonersDilemma
