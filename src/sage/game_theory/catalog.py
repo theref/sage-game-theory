@@ -265,3 +265,56 @@ def RPS():
     g = NormalFormGame([A])
     g.rename('Rock-Paper-Scissors: ' + repr(g))
     return g
+
+
+def RPSLS():
+    r"""
+    Return a Rock-Paper-Scissors-Lizard-Spock game
+
+    Rock-Paper-Scissors-Lizard-Spock an extension of Rock-Paper-Scissors.
+    It is a zero sum game usually played between two
+    players where each player simultaneously forms one of three
+    shapes with an outstretched hand. This game became popular
+    after appearing on the television show 'Big Bang Theory'.
+    The rules for the game can be summarised as follows:
+
+    - Scissors cuts Paper
+    - Paper covers Rock
+    - Rock crushes Lizard
+    - Lizard poisons Spock
+    - Spock smashes Scissors
+    - Scissors decapitates Lizard
+    - Lizard eats Paper
+    - Paper disproves Spock
+    - Spock vaporizes Rock
+    - (and as it always has) Rock crushes scissors
+
+    This can be modeled as a zero sum normal form game with the following
+    matrix:
+
+    .. math::
+
+        A = \begin{pmatrix}
+            0 & -1 & 1 & 1 & -1\\
+            1 & 0 & -1 & -1 & 1\\
+            -1 & 1 & 0 & 1 & -1\\
+            -1 & 1 & -1 & 0 & 1\\
+            1 & -1 & 1 & -1 & 0\\
+            \end{pmatrix}
+
+    This can be implemented in Sage using the following::
+
+        sage: g = game_theory.RPSLS()
+        sage: g
+        Rock-Paper-Scissors-Lizard-Spock: Normal Form Game with the following utilities: {(1, 3): [-1, 1], (3, 0): [-1, 1], (2, 1): [1, -1], (0, 3): [1, -1], (4, 0): [1, -1], (1, 2): [-1, 1], (3, 3): [0, 0], (4, 4): [0, 0], (2, 2): [0, 0], (4, 1): [-1, 1], (1, 1): [0, 0], (3, 2): [-1, 1], (0, 0): [0, 0], (0, 4): [-1, 1], (1, 4): [1, -1], (2, 3): [1, -1], (4, 2): [1, -1], (1, 0): [1, -1], (0, 1): [-1, 1], (3, 1): [1, -1], (2, 4): [-1, 1], (2, 0): [-1, 1], (4, 3): [-1, 1], (3, 4): [1, -1], (0, 2): [1, -1]}
+        sage: g.obtain_nash()
+        [[(1/5, 1/5, 1/5, 1/5, 1/5), (1/5, 1/5, 1/5, 1/5, 1/5)]]
+    """
+    A = matrix([[0, -1, 1, 1, -1],
+                [1, 0, -1, -1, 1],
+                [-1, 1, 0, 1 , -1],
+                [-1, 1, -1, 0, 1],
+                [1, -1, 1, -1, 0]])
+    g = NormalFormGame([A])
+    g.rename('Rock-Paper-Scissors-Lizard-Spock: ' + repr(g))
+    return g
