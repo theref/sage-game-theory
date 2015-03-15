@@ -26,17 +26,19 @@ def PrisonersDilemma():
 
     This can be modeled as a normal form game using the following two matrices:
 
-    .. MATH::
+    .. math::
 
-        A = \\begin{pmatrix}
-            2&0\\\\
-            3&1\\\\
+        A = \begin{pmatrix}
+            3&1\\
+            0&2\\
             \end{pmatrix}
 
-        B = \\begin{pmatrix}
-            2&3\\\\
-            0&1\\\\
+
+        B = \begin{pmatrix}
+            2&1\\
+            0&3\\
             \end{pmatrix}
+
 
     There is a single Nash equilibria for this at which both thieves defect.
     This can be implemented in Sage using the following::
@@ -63,25 +65,24 @@ def BattleOfTheSexes():
     together.
     This can be modeled as a normal form game using the following two matrices:
 
-    .. MATH::
+    .. math::
 
-        A = \\begin{pmatrix}
-            3&1\\\\
-            0&2\\\\
+        A = \begin{pmatrix}
+            3&1\\
+            0&2\\
             \end{pmatrix}
 
 
-        B = \\begin{pmatrix}
-            2&1\\\\
-            0&3\\\\
+        B = \begin{pmatrix}
+            2&1\\
+            0&3\\
             \end{pmatrix}
 
     There are three Nash equilibria:
 
-        1. Amy and Bob both play video games;
-        2. Amy and Bob both watch a movie;
-        3. Amy plays video games 75% of the time and Bob watches a movie
-        75% of the time.
+    1. Amy and Bob both play video games;
+    2. Amy and Bob both watch a movie;
+    3. Amy plays video games 75% of the time and Bob watches a movie 75% of the time.
 
     This can be implemented in Sage using the following::
 
@@ -109,17 +110,17 @@ def HawkDove():
     Two doves can share the resource.
     This can be modeled as a normal form game using the following two matrices:
 
-    .. MATH::
+    .. math::
 
-        A = \\begin{pmatrix}
-            0&3\\\\
-            1&2\\\\
+        A = \begin{pmatrix}
+            0&3\\
+            1&2\\
             \end{pmatrix}
 
 
-        B = \\begin{pmatrix}
-            0&1\\\\
-            3&2\\\\
+        B = \begin{pmatrix}
+            0&1\\
+            3&2\\
             \end{pmatrix}
 
     There are three Nash equilibria:
@@ -160,17 +161,17 @@ def Pigs():
 
     This can be modeled as a normal form game using the following two matrices:
 
-    .. MATH::
+    .. math::
 
-        A = \\begin{pmatrix}
-            4&2\\\\
-            6&0\\\\
+        A = \begin{pmatrix}
+            4&2\\
+            6&0\\
             \end{pmatrix}
 
 
-        B = \\begin{pmatrix}
-            2&3\\\\
-            -1&0\\\\
+        B = \begin{pmatrix}
+            2&3\\
+            -1&0\\
             \end{pmatrix}
 
     There is a single Nash equilibrium at which the dominant pig pushes the
@@ -203,11 +204,11 @@ def MatchingPennies():
     This can be modeled as a zero sum normal form game with the following
     matrix:
 
-    .. MATH::
+    .. math::
 
-        A = \\begin{pmatrix}
-            1&-1\\\\
-            -1&1\\\\
+        A = \begin{pmatrix}
+            1&-1\\
+            -1&1\\
             \end{pmatrix}
 
     There is a single Nash equilibria at which both players randomly
