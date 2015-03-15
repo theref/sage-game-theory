@@ -65,3 +65,18 @@ def Pigs():
     g = NormalFormGame([A, B])
     g.rename('Pigs: ' + repr(g))
     return g
+
+def MatchingPennies():
+    """
+    Return a Matching Pennies game
+
+        sage: g = game_theory.MatchingPennies()
+        sage: g
+        Matching pennies: Normal Form Game with the following utilities: {(0, 1): [-1, 1], (1, 0): [-1, 1], (0, 0): [1, -1], (1, 1): [1, -1]}
+        sage: g.obtain_nash()
+        [[(1/2, 1/2), (1/2, 1/2)]]
+    """
+    A = matrix([[1, -1], [-1, 1]])
+    g = NormalFormGame([A])
+    g.rename('Matching pennies: ' + repr(g))
+    return g
