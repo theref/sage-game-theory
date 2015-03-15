@@ -225,3 +225,43 @@ def MatchingPennies():
     g = NormalFormGame([A])
     g.rename('Matching pennies: ' + repr(g))
     return g
+
+
+def RPS():
+    r"""
+    Return a Rock-Paper-Scissors game
+
+    Rock-Paper-Scissors is a zero sum hand game usually played between two
+    people/ players where each player simultaneously forms one of three
+    shapes with an outstretched hand.The game has only three possible outcomes
+    other than a tie: a player who decides to play rock will beat another
+    player who has chosen scissors ("rock crushes scissors") but will lose to
+    one who has played paper ("paper covers rock"); a play of paper will lose
+    to a play of scissors ("scissors cut paper"). If both players throw the
+    same shape, the game is tied and is usually immediately replayed to break
+    the tie.
+
+    This can be modeled as a zero sum normal form game with the following
+    matrix:
+
+    .. MATH::
+
+        A = \\begin{pmatrix}
+            & R & P & S\\\\
+            R & 0 & -1 & 1\\\\
+            P & 1 & 0 & -1\\\\
+            S & -1 & 1 & 0\\\\
+            \end{pmatrix}
+
+    This can be implemented in Sage using the following::
+
+        sage: g = game_theory.RPS()
+        sage: g
+        Matching pennies: Normal Form Game with the following utilities: {(0, 1): [-1, 1], (1, 0): [-1, 1], (0, 0): [1, -1], (1, 1): [1, -1]}
+        sage: g.obtain_nash()
+        [[(1/2, 1/2), (1/2, 1/2)]]
+    """
+    A = matrix([[1, -1], [-1, 1]])
+    g = NormalFormGame([A])
+    g.rename('Rock-Paper-Scissors: ' + repr(g))
+    return g
