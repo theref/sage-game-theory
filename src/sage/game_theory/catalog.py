@@ -10,7 +10,9 @@ def PrisonersDilemma():
 
         sage: g = game_theory.PrisonersDilemma()
         sage: g
-        Normal Form Game with the following utilities: {(0, 1): [5, 0], (1, 0): [0, 5], (0, 0): [2, 2], (1, 1): [4, 4]}
+        Prisoners Dilemma: Normal Form Game with the following utilities: {(0, 1): [5, 0], (1, 0): [0, 5], (0, 0): [2, 2], (1, 1): [4, 4]}
+        sage: g.obtain_nash()
+        [[(0, 1), (0, 1)]]
     """
     A = matrix([[2,5],[0,4]])
     g = NormalFormGame([A, A.transpose()])
