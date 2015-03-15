@@ -73,7 +73,7 @@ def BattleOfTheSexes():
             0&3\\\\
             \end{pmatrix}
 
-    There are three Nash equilibrium:
+    There are three Nash equilibria:
 
         1. Amy and Bob both play video games;
         2. Amy and Bob both watch a movie;
@@ -97,6 +97,33 @@ def BattleOfTheSexes():
 def HawkDove():
     """
     Return a Hawk Dove game
+
+    Suppose two birds of prey must share a limited resource.
+    The birds can act like a hawk or a dove.
+    Hawks always fight over the resource to the point of exterminating a fellow hawk and/or take a majority of the resource from a dove.
+    Two doves can share the resource.
+    This can be modeled as a normal form game using the following two matrices:
+
+    .. MATH::
+
+        A = \\begin{pmatrix}
+            0&3\\\\
+            1&2\\\\
+            \end{pmatrix}
+
+
+        B = \\begin{pmatrix}
+            0&1\\\\
+            3&2\\\\
+            \end{pmatrix}
+
+    There are three Nash equilibria:
+
+        1. Both birds act like Hawks;
+        2. Both birds act like Doves;
+        3. Both birds are equally likely to act like a Hawk of a Dove.
+
+    This can be implemented in Sage using the following::
 
         sage: g = game_theory.HawkDove()
         sage: g
