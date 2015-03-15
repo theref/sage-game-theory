@@ -10,6 +10,7 @@ AUTHOR:
 """
 from sage.game_theory.normal_form_game import NormalFormGame
 from sage.matrix.constructor import matrix
+from sage.functions.generalized import sign
 
 
 def PrisonersDilemma():
@@ -398,19 +399,97 @@ def Chicken():
 
     There are three Nash equilibria:
 
-        1. Both friends hunting the stag.
-        2. Both friends hunting the hare.
-        3. Both friends hunting the stag 2/3rds of the time.
+        1. The second player swerving
+        2. The first player swerving
+        3. Both players swerving with 1 out of 10 times
 
     This can be implemented in Sage using the following::
 
         sage: g = game_theory.Chicken()
         sage: g
-        Chicken : Normal Form Game with the following utilities: {(0, 1): [-1, 1], (1, 0): [1, -1], (0, 0): [0, 0], (1, 1): [-10, -10]}
+        Chicken: Normal Form Game with the following utilities: {(0, 1): [-1, 1], (1, 0): [1, -1], (0, 0): [0, 0], (1, 1): [-10, -10]}
         sage: g.obtain_nash()
         [[(0, 1), (1, 0)], [(9/10, 1/10), (9/10, 1/10)], [(1, 0), (0, 1)]]
     """
     A = matrix([[0, -1], [1, -10]])
     g = NormalFormGame([A, A.transpose()])
-    g.rename('Chicken : ' + repr(g))
+    g.rename('Chicken: ' + repr(g))
+    return g
+
+def TravellersDilemma(max_value=10):
+    r"""
+    Return a Travellers dilemma game.
+
+    An airline loses two suitcases belonging to two different travelers. Both
+    suitcases happen to be identical and contain identical antiques. An
+    airline manager tasked to settle the claims of both travelers explains
+    that the airline is liable for a maximum of 10 per suitcase, and in order
+    to determine an honest appraised value of the antiques the manager
+    separates both travelers so they can't confer, and asks them to write down
+    the amount of their value at no less than 2 and no larger than 10. He
+    also tells them that if both write down the same number, he will treat
+    that number as the true dollar value of both suitcases and reimburse both
+    travelers that amount.
+
+    However, if one writes down a smaller number than the other, this smaller
+    number will be taken as the true dollar value, and both travelers will
+    receive that amount along with a bonus/malus: 2 extra will be paid to the
+    traveler who wrote down the lower value and a 2 deduction will be taken
+    from the person who wrote down the higher amount. The challenge is: what
+    strategy should both travelers follow to decide the value they should
+    write down?
+
+    This can be modeled as a normal form game using the following two matrices:
+
+    .. math::
+
+        A = \begin{pmatrix}
+            10 & 7  & 6 & 5 & 4 & 3 & 2 & 1 & 0\\
+            11 & 9  & 6 & 5 & 4 & 3 & 2 & 1 & 0\\
+            10 & 10 & 8 & 5 & 4 & 3 & 2 & 1 & 0\\
+            9  & 9  & 9 & 7 & 4 & 3 & 2 & 1 & 0\\
+            8  & 8  & 8 & 8 & 6 & 3 & 2 & 1 & 0\\
+            7  & 7  & 7 & 7 & 7 & 5 & 2 & 1 & 0\\
+            6  & 6  & 6 & 6 & 6 & 6 & 4 & 1 & 0\\
+            5  & 5  & 5 & 5 & 5 & 5 & 5 & 3 & 0\\
+            4  & 4  & 4 & 4 & 4 & 4 & 4 & 4 & 2\\
+            \end{pmatrix}
+
+        B = \begin{pmatrix}
+            10 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4\\
+            7  & 9  & 10 & 9 & 8 & 7 & 6 & 5 & 4\\
+            6  & 6  & 8  & 9 & 8 & 7 & 6 & 5 & 4\\
+            5  & 5  & 5  & 7 & 8 & 7 & 6 & 5 & 4\\
+            4  & 4  & 4  & 4 & 6 & 7 & 6 & 5 & 4\\
+            3  & 3  & 3  & 3 & 3 & 5 & 6 & 5 & 4\\
+            2  & 2  & 2  & 2 & 2 & 2 & 4 & 5 & 4\\
+            1  & 1  & 1  & 1 & 1 & 1 & 1 & 3 & 4\\
+            0  & 0  & 0  & 0 & 0 & 0 & 0 & 0 & 2\\
+            \end{pmatrix}
+
+
+    There is a single Nash equilibrium to this game resulting in
+    both players naming the smallest possible value
+
+    This can be implemented in Sage using the following::
+
+        sage: g = game_theory.TravellersDilemma()
+        sage: g
+        Travellers dilemma: Normal Form Game with the following utilities: {(7, 3): [5, 1], (4, 7): [1, 5], (1, 3): [5, 9], (4, 8): [0, 4], (3, 0): [9, 5], (2, 8): [0, 4], (8, 0): [4, 0], (7, 8): [0, 4], (5, 4): [7, 3], (0, 7): [1, 5], (5, 6): [2, 6], (2, 6): [2, 6], (1, 6): [2, 6], (5, 1): [7, 3], (3, 7): [1, 5], (0, 3): [5, 9], (8, 5): [4, 0], (2, 5): [3, 7], (5, 8): [0, 4], (4, 0): [8, 4], (1, 2): [6, 10], (7, 4): [5, 1], (6, 4): [6, 2], (3, 3): [7, 7], (2, 0): [10, 6], (8, 1): [4, 0], (7, 6): [5, 1], (4, 4): [6, 6], (6, 3): [6, 2], (1, 5): [3, 7], (8, 8): [2, 2], (7, 2): [5, 1], (3, 6): [2, 6], (2, 2): [8, 8], (7, 7): [3, 3], (5, 7): [1, 5], (5, 3): [7, 3], (4, 1): [8, 4], (1, 1): [9, 9], (2, 7): [1, 5], (3, 2): [9, 5], (0, 0): [10, 10], (6, 6): [4, 4], (5, 0): [7, 3], (7, 1): [5, 1], (4, 5): [3, 7], (0, 4): [4, 8], (5, 5): [5, 5], (1, 4): [4, 8], (6, 0): [6, 2], (7, 5): [5, 1], (2, 3): [5, 9], (2, 1): [10, 6], (8, 7): [4, 0], (6, 8): [0, 4], (4, 2): [8, 4], (1, 0): [11, 7], (0, 8): [0, 4], (6, 5): [6, 2], (3, 5): [3, 7], (0, 1): [7, 11], (8, 3): [4, 0], (7, 0): [5, 1], (4, 6): [2, 6], (6, 7): [1, 5], (8, 6): [4, 0], (5, 2): [7, 3], (6, 1): [6, 2], (3, 1): [9, 5], (8, 2): [4, 0], (2, 4): [4, 8], (3, 8): [0, 4], (0, 6): [2, 6], (1, 8): [0, 4], (6, 2): [6, 2], (4, 3): [8, 4], (1, 7): [1, 5], (0, 5): [3, 7], (3, 4): [4, 8], (0, 2): [6, 10], (8, 4): [4, 0]}
+        sage: g.obtain_nash()
+        [[(0, 0, 0, 0, 0, 0, 0, 0, 1), (0, 0, 0, 0, 0, 0, 0, 0, 1)]]
+
+        Note that this command can be used to create travellers dilemma for a
+         different maximum value of the luggage. Below is an implementation
+        with a maximum value of 5::
+
+        sage: g = game_theory.TravellersDilemma(5)
+        sage: g
+        Travellers dilemma: Normal Form Game with the following utilities: {(0, 1): [2, 6], (1, 2): [1, 5], (3, 2): [4, 0], (0, 0): [5, 5], (3, 3): [2, 2], (3, 0): [4, 0], (3, 1): [4, 0], (2, 1): [5, 1], (0, 2): [1, 5], (2, 0): [5, 1], (1, 3): [0, 4], (2, 3): [0, 4], (2, 2): [3, 3], (1, 0): [6, 2], (0, 3): [0, 4], (1, 1): [4, 4]}
+        sage: g.obtain_nash()
+        [[(0, 0, 0, 1), (0, 0, 0, 1)]]
+    """
+    A = matrix([[min(i, j) + 2 * sign(j - i) for j in range(max_value, 1, -1)] for i in range(max_value, 1, -1)])
+    g = NormalFormGame([A, A.transpose()])
+    g.rename('Travellers dilemma: ' + repr(g))
     return g
