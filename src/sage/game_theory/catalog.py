@@ -265,3 +265,44 @@ def RPS():
     g = NormalFormGame([A])
     g.rename('Rock-Paper-Scissors: ' + repr(g))
     return g
+
+
+def StagHunt():
+    r"""
+    Return a Trust dilemma game.
+
+    Assume two friends go out on a hunt. Each can individually choose to hunt
+    a stag or hunt a hare. Each player must choose an action without knowing
+    the choice of the other. If an individual hunts a stag, he must have the
+    cooperation of his partner in order to succeed. An individual can get a
+    hare by himself, but a hare is worth less than a stag.
+
+    This can be modeled as a normal form game using the following two matrices:
+
+    .. math::
+
+        A = \begin{pmatrix}
+            5&0\\
+            4&2\\
+            \end{pmatrix}
+
+
+        B = \begin{pmatrix}
+            5&4\\
+            0&2\\
+            \end{pmatrix}
+
+
+    There are two Nash equilibria for this.
+    This can be implemented in Sage using the following::
+
+        sage: g = game_theory.StagHunt()
+        sage: g
+        StagHunt: Normal Form Game with the following utilities: {(0, 1): [0, 3], (1, 0): [3, 0], (0, 0): [2, 2], (1, 1): [1, 1]}
+        sage: g.obtain_nash()
+        [[(0, 1), (0, 1)]]
+    """
+    A = matrix([[5, 0], [4, 2]])
+    g = NormalFormGame([A, A.transpose()])
+    g.rename('Stag Hunt: ' + repr(g))
+    return g
