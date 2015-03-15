@@ -26,10 +26,10 @@ def BattleOfTheSexes():
         sage: g
         Battle of the sexes: Normal Form Game with the following utilities: {(0, 1): [0, 1], (1, 0): [1, 0], (0, 0): [3, 2], (1, 1): [2, 3]}
         sage: g.obtain_nash()
-        [[(0, 1), (0, 1)], [(3/4, 1/4), (1/2, 1/2)], [(1, 0), (1, 0)]]
+        [[(0, 1), (0, 1)], [(1/2, 1/2), (1/2, 1/2)], [(1, 0), (1, 0)]]
     """
     A = matrix([[3, 0], [1, 2]])
-    B = matrix([[2, 1], [0, 3]])
+    B = matrix([[2, 0], [1, 3]])
     g = NormalFormGame([A, B])
     return g
 
@@ -39,7 +39,21 @@ def HawkDove():
 
         sage: g = game_theory.HawkDove()
         sage: g
-        Hawk-Dove: Normal Form Game with the following utilities: {(0, 1): [2, 3], (1, 0): [6, -1], (0, 0): [4, 2], (1, 1): [0, 0]}
+        Hawk-Dove: Normal Form Game with the following utilities: {(0, 1): [3, 3], (1, 0): [6, -1], (0, 0): [4, 2], (1, 1): [0, 0]}
+        sage: g.obtain_nash()
+        [[(0, 1), (1, 0)], [(1/2, 1/2), (1/2, 1/2)], [(1, 0), (0, 1)]]
+    """
+    A = matrix([[0, 3], [1, 2]])
+    g = NormalFormGame([A, A.transpose()])
+    return g
+
+def Pigs():
+    """
+    Return a Pigs game
+
+        sage: g = game_theory.Pigs()
+        sage: g
+        Pigs: Normal Form Game with the following utilities: {(0, 1): [2, 3], (1, 0): [6, -1], (0, 0): [4, 2], (1, 1): [0, 0]}
         sage: g.obtain_nash()
         [[(1, 0), (0, 1)]]
     """
