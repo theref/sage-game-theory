@@ -3,6 +3,10 @@ Documentation for the game theory catalog
 
 A catalog of named normal form games.
 The docstrings give an interpretation of the situation they model.
+
+AUTHOR:
+
+- James Campbell and Vince Knight (06-2014)
 """
 from sage.game_theory.normal_form_game import NormalFormGame
 from sage.matrix.constructor import matrix
