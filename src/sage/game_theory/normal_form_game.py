@@ -488,6 +488,13 @@ A good description of degenerate games can be found in [NN2007]_.
 Several standard Normal Form Games have also been implemented.
 For more information on how to access these, see: :mod:`Game Theory Catalog<sage.game_theory.catalog>`.
 Included is information on the situation each Game models.
+For example::
+
+    sage: g = game_theory.PrisonersDilemma()
+    sage: g
+    Prisoners dilemma: Normal Form Game with the following utilities: {(0, 1): [0, 3], (1, 0): [3, 0], (0, 0): [2, 2], (1, 1): [1, 1]}
+    sage: g.obtain_nash()
+    [[(0, 1), (0, 1)]]
 
 REFERENCES:
 
