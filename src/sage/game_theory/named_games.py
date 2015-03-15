@@ -13,3 +13,4 @@ from sage.game_theory.catalog import Pigs
 from sage.game_theory.catalog import PrisonersDilemma
 from sage.game_theory.catalog import RPS
 from sage.game_theory.catalog import RPSLS
+from sage.game_theory.catalog import StagHunt

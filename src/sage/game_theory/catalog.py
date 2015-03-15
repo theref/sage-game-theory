@@ -242,6 +242,10 @@ def RPS():
     same shape, the game is tied and is usually immediately replayed to break
     the tie.
 
+    There is a single Nash equilibrium to this game, corresponding to players
+    randomly choosing (with equal probability) between Rock, Paper and
+    Scissors.
+
     This can be modeled as a zero sum normal form game with the following
     matrix:
 
@@ -289,6 +293,10 @@ def RPSLS():
     - Spock vaporizes Rock
     - (and as it always has) Rock crushes scissors
 
+    There is a single Nash equilibrium to this game, corresponding to players
+    randomly choosing (with equal probability) between Rock, Paper, Scissors
+    Lizard and Spock.
+
     This can be modeled as a zero sum normal form game with the following
     matrix:
 
@@ -317,4 +325,49 @@ def RPSLS():
                 [1, -1, 1, -1, 0]])
     g = NormalFormGame([A])
     g.rename('Rock-Paper-Scissors-Lizard-Spock: ' + repr(g))
+    return g
+
+def StagHunt():
+    r"""
+    Return a Stag Hunt game.
+
+    Assume two friends go out on a hunt. Each can individually choose to hunt
+    a stag or hunt a hare. Each player must choose an action without knowing
+    the choice of the other. If an individual hunts a stag, he must have the
+    cooperation of his partner in order to succeed. An individual can get a
+    hare by himself, but a hare is worth less than a stag.
+
+    This can be modeled as a normal form game using the following two matrices:
+
+    .. math::
+
+        A = \begin{pmatrix}
+            5&0\\
+            4&2\\
+            \end{pmatrix}
+
+
+        B = \begin{pmatrix}
+            5&4\\
+            0&2\\
+            \end{pmatrix}
+
+
+    There are three Nash equilibria:
+
+        1. Both friends hunting the stag.
+        2. Both friends hunting the hare.
+        3. Both friends hunting the stag 2/3rds of the time.
+
+    This can be implemented in Sage using the following::
+
+        sage: g = game_theory.StagHunt()
+        sage: g
+        Stag Hunt: Normal Form Game with the following utilities: {(0, 1): [0, 4], (1, 0): [4, 0], (0, 0): [5, 5], (1, 1): [2, 2]}
+        sage: g.obtain_nash()
+        [[(0, 1), (0, 1)], [(2/3, 1/3), (2/3, 1/3)], [(1, 0), (1, 0)]]
+    """
+    A = matrix([[5, 0], [4, 2]])
+    g = NormalFormGame([A, A.transpose()])
+    g.rename('Stag Hunt: ' + repr(g))
     return g
