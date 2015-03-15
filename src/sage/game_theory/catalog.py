@@ -10,11 +10,11 @@ def PrisonersDilemma():
 
         sage: g = game_theory.PrisonersDilemma()
         sage: g
-        Prisoners dilemma: Normal Form Game with the following utilities: {(0, 1): [5, 0], (1, 0): [0, 5], (0, 0): [2, 2], (1, 1): [4, 4]}
+        Prisoners dilemma: Normal Form Game with the following utilities: {(0, 1): [0, 3], (1, 0): [3, 0], (0, 0): [2, 2], (1, 1): [1, 1]}
         sage: g.obtain_nash()
         [[(0, 1), (0, 1)]]
     """
-    A = matrix([[2, 5], [0, 4]])
+    A = matrix([[2, 0], [3, 1]])
     g = NormalFormGame([A, A.transpose()])
     g.rename('PrisonersDilemma: ' + repr(g))
     return g
@@ -31,5 +31,20 @@ def BattleOfTheSexes():
     """
     A = matrix([[3, 0], [1, 2]])
     B = matrix([[2, 1], [0, 3]])
+    g = NormalFormGame([A, B])
+    return g
+
+def HawkDove():
+    """
+    Return a Hawk Dove game
+
+        sage: g = game_theory.HawkDove()
+        sage: g
+        Hawk-Dove: Normal Form Game with the following utilities: {(0, 1): [2, 3], (1, 0): [6, -1], (0, 0): [4, 2], (1, 1): [0, 0]}
+        sage: g.obtain_nash()
+        [[(1, 0), (0, 1)]]
+    """
+    A = matrix([[4, 2], [6, 0]])
+    B = matrix([[2, 3], [-1, 0]])
     g = NormalFormGame([A, B])
     return g
