@@ -371,3 +371,46 @@ def StagHunt():
     g = NormalFormGame([A, A.transpose()])
     g.rename('Stag Hunt: ' + repr(g))
     return g
+
+def Chicken():
+    r"""
+    Return a Chicken game.
+
+    Consider two drivers locked in a fierce battle for pride. They drive
+    towards a cliff and the winner is declared as the last one to swerve.
+    If neither player swerves they will both fall off the cliff.
+
+    This can be modeled as a normal form game using the following two matrices:
+
+    .. math::
+
+        A = \begin{pmatrix}
+            0&-1\\
+            1&-10\\
+            \end{pmatrix}
+
+
+        B = \begin{pmatrix}
+            0&1\\
+            -1&-10\\
+            \end{pmatrix}
+
+
+    There are three Nash equilibria:
+
+        1. Both friends hunting the stag.
+        2. Both friends hunting the hare.
+        3. Both friends hunting the stag 2/3rds of the time.
+
+    This can be implemented in Sage using the following::
+
+        sage: g = game_theory.Chicken()
+        sage: g
+        Chicken : Normal Form Game with the following utilities: {(0, 1): [-1, 1], (1, 0): [1, -1], (0, 0): [0, 0], (1, 1): [-10, -10]}
+        sage: g.obtain_nash()
+        [[(0, 1), (1, 0)], [(9/10, 1/10), (9/10, 1/10)], [(1, 0), (0, 1)]]
+    """
+    A = matrix([[0, -1], [1, -10]])
+    g = NormalFormGame([A, A.transpose()])
+    g.rename('Chicken : ' + repr(g))
+    return g
