@@ -16,6 +16,7 @@ def PrisonersDilemma():
     """
     A = matrix([[2, 5], [0, 4]])
     g = NormalFormGame([A, A.transpose()])
+    g.rename('PrisonersDilemma: ' + repr(g))
     return g
 
 def BattleOfTheSexes():
