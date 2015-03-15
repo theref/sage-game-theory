@@ -11,3 +11,4 @@ from sage.game_theory.catalog import HawkDove
 from sage.game_theory.catalog import MatchingPennies
 from sage.game_theory.catalog import Pigs
 from sage.game_theory.catalog import PrisonersDilemma
+from sage.game_theory.catalog import RPS

@@ -232,8 +232,8 @@ def RPS():
     r"""
     Return a Rock-Paper-Scissors game
 
-    Rock-Paper-Scissors is a zero sum hand game usually played between two
-    people/ players where each player simultaneously forms one of three
+    Rock-Paper-Scissors is a zero sum game usually played between two
+    players where each player simultaneously forms one of three
     shapes with an outstretched hand.The game has only three possible outcomes
     other than a tie: a player who decides to play rock will beat another
     player who has chosen scissors ("rock crushes scissors") but will lose to
@@ -245,24 +245,23 @@ def RPS():
     This can be modeled as a zero sum normal form game with the following
     matrix:
 
-    .. MATH::
+    .. math::
 
-        A = \\begin{pmatrix}
-            & R & P & S\\\\
-            R & 0 & -1 & 1\\\\
-            P & 1 & 0 & -1\\\\
-            S & -1 & 1 & 0\\\\
+        A = \begin{pmatrix}
+            0 & -1 & 1\\
+            1 & 0 & -1\\
+            -1 & 1 & 0\\
             \end{pmatrix}
 
     This can be implemented in Sage using the following::
 
         sage: g = game_theory.RPS()
         sage: g
-        Matching pennies: Normal Form Game with the following utilities: {(0, 1): [-1, 1], (1, 0): [-1, 1], (0, 0): [1, -1], (1, 1): [1, -1]}
+        Rock-Paper-Scissors: Normal Form Game with the following utilities: {(0, 1): [-1, 1], (1, 2): [-1, 1], (0, 0): [0, 0], (2, 1): [1, -1], (1, 1): [0, 0], (2, 0): [-1, 1], (2, 2): [0, 0], (1, 0): [1, -1], (0, 2): [1, -1]}
         sage: g.obtain_nash()
-        [[(1/2, 1/2), (1/2, 1/2)]]
+        [[(1/3, 1/3, 1/3), (1/3, 1/3, 1/3)]]
     """
-    A = matrix([[1, -1], [-1, 1]])
+    A = matrix([[0, -1, 1], [1, 0, -1], [-1, 1, 0]])
     g = NormalFormGame([A])
     g.rename('Rock-Paper-Scissors: ' + repr(g))
     return g
