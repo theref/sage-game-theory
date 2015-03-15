@@ -1,4 +1,4 @@
-"""
+r"""
 Documentation for the game theory catalog
 
 A catalog of named normal form games.
@@ -13,7 +13,7 @@ from sage.matrix.constructor import matrix
 
 
 def PrisonersDilemma():
-    """
+    r"""
     Assume two thieves have been caught by the police and separated for questioning.
     If both thieves cooperate and don’t divulge any information they will each get a short sentence.
     If one defects he/she is offered a deal while the other thief will get a long sentence.
@@ -49,7 +49,7 @@ def PrisonersDilemma():
 
 
 def BattleOfTheSexes():
-    """
+    r"""
     Return a Battle of the Sexes game
 
         sage: g = game_theory.BattleOfTheSexes()
@@ -66,7 +66,7 @@ def BattleOfTheSexes():
 
 
 def HawkDove():
-    """
+    r"""
     Return a Hawk Dove game
 
         sage: g = game_theory.HawkDove()
@@ -82,7 +82,7 @@ def HawkDove():
 
 
 def Pigs():
-    """
+    r"""
     Return a Pigs game
 
         sage: g = game_theory.Pigs()
@@ -99,7 +99,7 @@ def Pigs():
 
 
 def MatchingPennies():
-    """
+    r"""
     Return a Matching Pennies game
 
         sage: g = game_theory.MatchingPennies()
