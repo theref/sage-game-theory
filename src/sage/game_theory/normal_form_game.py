@@ -433,19 +433,19 @@ write down?
 In the following we create the game (with a max value of 10) and solve it::
 
     sage: K = 10  # Modifying this value lets us play with games of any size
-    sage: A = matrix([[min(i,j) + 2 * sign(j-i)  for j in range(2, K+1)]  for i in range(2, K+1)])
-    sage: B = matrix([[min(i,j) + 2 * sign(i-j)  for j in range(2, K+1)]  for i in range(2, K+1)])
+    sage: A = matrix([[min(i,j) + 2 * sign(j-i)  for j in range(K, 1, -1)]  for i in range(K, 1, -1)])
+    sage: B = matrix([[min(i,j) + 2 * sign(i-j)  for j in range(K, 1, -1)]  for i in range(K, 1, -1)])
     sage: g = NormalFormGame([A, B])
     sage: g.obtain_nash(algorithm='lrs') # optional - lrs
-    [[(1, 0, 0, 0, 0, 0, 0, 0, 0), (1, 0, 0, 0, 0, 0, 0, 0, 0)]]
+    [[(0, 0, 0, 0, 0, 0, 0, 0, 1), (0, 0, 0, 0, 0, 0, 0, 0, 1)]]
     sage: g.obtain_nash(algorithm='LCP') # optional - gambit
-    [[(1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0), (1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)]]
+    [[(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0), (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0)]]
 
 The output is a pair of vectors (as before) showing the Nash equilibrium.
 In particular it here shows that out of the 10 possible strategies both
-players should choose the first. Recall that the above considers a reduced
-version of the game where individuals can claim integer values between 2
-and 10.  The equilibrium strategy is thus for both players to state that
+players should choose the last. Recall that the above considers a reduced
+version of the game where individuals can claim integer values from 10
+to 2.  The equilibrium strategy is thus for both players to state that
 the value of their suitcase is 2.
 
 Note that degenerate games can cause problems for most algorithms.
