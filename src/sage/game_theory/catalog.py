@@ -16,9 +16,12 @@ def PrisonersDilemma():
     """
     Return a Prisoners dilemma game.
 
-    Assume two thieves have been caught by the police and separated for questioning.
-    If both thieves cooperate and don’t divulge any information they will each get a short sentence.
-    If one defects he/she is offered a deal while the other thief will get a long sentence.
+    Assume two thieves have been caught by the police
+    and separated for questioning.
+    If both thieves cooperate and do not divulge any information they will
+    each get a short sentence.
+    If one defects he/she is offered a deal while the other thief will get a
+    long sentence.
     If they both defect they both get a medium length sentence.
 
     This can be modeled as a normal form game using the following two matrices:
@@ -77,7 +80,8 @@ def BattleOfTheSexes():
 
         1. Amy and Bob both play video games;
         2. Amy and Bob both watch a movie;
-        3. Amy plays video games 75% of the time and Bob watches a movie 75% of the time.
+        3. Amy plays video games 75% of the time and Bob watches a movie
+        75% of the time.
 
     This can be implemented in Sage using the following::
 
@@ -100,7 +104,8 @@ def HawkDove():
 
     Suppose two birds of prey must share a limited resource.
     The birds can act like a hawk or a dove.
-    Hawks always fight over the resource to the point of exterminating a fellow hawk and/or take a majority of the resource from a dove.
+    Hawks always fight over the resource to the point of exterminating a
+    fellow hawk and/or take a majority of the resource from a dove.
     Two doves can share the resource.
     This can be modeled as a normal form game using the following two matrices:
 
@@ -141,6 +146,38 @@ def Pigs():
     """
     Return a Pigs game
 
+    Consider two pigs.
+    One dominant pig and one subservient pig.
+    These pigs share a pen.
+    There is a lever in the pen that delivers food but if either pig pushes
+    the lever it will take them a little while to get to the food.
+    If the dominant pig pushes the lever, the subservient pig has some time
+    to eat most of the food before being pushed out of the way.
+    If the subservient pig push the lever,
+    the dominant pig will eat all the food.
+    Finally if both pigs go to push the lever the subservient pig will be
+    able to eat a third of the food.
+
+    This can be modeled as a normal form game using the following two matrices:
+
+    .. MATH::
+
+        A = \\begin{pmatrix}
+            4&2\\\\
+            6&0\\\\
+            \end{pmatrix}
+
+
+        B = \\begin{pmatrix}
+            2&3\\\\
+            -1&0\\\\
+            \end{pmatrix}
+
+    There is a single Nash equilibrium at which the dominant pig pushes the
+    lever and the subservient pig does not.
+
+    This can be implemented in Sage using the following::
+
         sage: g = game_theory.Pigs()
         sage: g
         Pigs: Normal Form Game with the following utilities: {(0, 1): [2, 3], (1, 0): [6, -1], (0, 0): [4, 2], (1, 1): [0, 0]}
@@ -156,7 +193,27 @@ def Pigs():
 
 def MatchingPennies():
     """
-    Return a Matching Pennies game
+    Return a Matching pennies game
+
+    Consider two players who can choose to display a coin either Heads
+    facing up or Tails facing up.
+    If both players show the same face then player 1 wins,
+    if not then player 2 wins.
+
+    This can be modeled as a zero sum normal form game with the following
+    matrix:
+
+    .. MATH::
+
+        A = \\begin{pmatrix}
+            1&-1\\\\
+            -1&1\\\\
+            \end{pmatrix}
+
+    There is a single Nash equilibria at which both players randomly
+    (with equal probability) pick heads or tails.
+
+    This can be implemented in Sage using the following::
 
         sage: g = game_theory.MatchingPennies()
         sage: g
