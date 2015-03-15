@@ -11,6 +11,7 @@ AUTHOR:
 from sage.game_theory.normal_form_game import NormalFormGame
 from sage.matrix.constructor import matrix
 
+
 def PrisonersDilemma():
     """
     Return a Prisoners Dilemma game
@@ -25,6 +26,7 @@ def PrisonersDilemma():
     g = NormalFormGame([A, A.transpose()])
     g.rename('Prisoners dilemma: ' + repr(g))
     return g
+
 
 def BattleOfTheSexes():
     """
@@ -42,6 +44,7 @@ def BattleOfTheSexes():
     g.rename('Battle of the sexes: ' + repr(g))
     return g
 
+
 def HawkDove():
     """
     Return a Hawk Dove game
@@ -56,6 +59,7 @@ def HawkDove():
     g = NormalFormGame([A, A.transpose()])
     g.rename('Hawk-Dove: ' + repr(g))
     return g
+
 
 def Pigs():
     """
@@ -72,6 +76,7 @@ def Pigs():
     g = NormalFormGame([A, B])
     g.rename('Pigs: ' + repr(g))
     return g
+
 
 def MatchingPennies():
     """
