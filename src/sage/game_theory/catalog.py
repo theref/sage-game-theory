@@ -1,5 +1,8 @@
 """
 Documentation for the game theory catalog
+
+A catalog of named normal form games.
+The docstrings give an interpretation of the situation they model.
 """
 from sage.game_theory.normal_form_game import NormalFormGame
 from sage.matrix.constructor import matrix
