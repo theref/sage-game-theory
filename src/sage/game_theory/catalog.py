@@ -8,8 +8,7 @@ def PrisonersDilemma():
     """
     Return a Prisoners Dilemma game
 
-        sage: import sage.game_theory.catalog
-        sage: g = sage.game_theory.catalog.PrisonersDilemma()
+        sage: g = game_theory.catalog.PrisonersDilemma()
         sage: g
         Normal Form Game with the following utilities: {(0, 1): [5, 0], (1, 0): [0, 5], (0, 0): [2, 2], (1, 1): [4, 4]}
     """
