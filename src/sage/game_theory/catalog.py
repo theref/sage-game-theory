@@ -32,6 +32,7 @@ def BattleOfTheSexes():
     A = matrix([[3, 0], [1, 2]])
     B = matrix([[2, 1], [0, 3]])
     g = NormalFormGame([A, B])
+    g.rename('Battle of the sexes: ' + repr(g))
     return g
 
 def HawkDove():
@@ -47,4 +48,5 @@ def HawkDove():
     A = matrix([[4, 2], [6, 0]])
     B = matrix([[2, 3], [-1, 0]])
     g = NormalFormGame([A, B])
+    g.rename('Hawk-Dove: ' + repr(g))
     return g
