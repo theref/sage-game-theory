@@ -14,7 +14,27 @@ from sage.matrix.constructor import matrix
 
 def PrisonersDilemma():
     """
-    Return a Prisoners Dilemma game
+    Assume two thieves have been caught by the police and separated for questioning.
+    If both thieves cooperate and don’t divulge any information they will each get a short sentence.
+    If one defects he/she is offered a deal while the other thief will get a long sentence.
+    If they both defect they both get a medium length sentence.
+
+    This can be modeled as a normal form game using the following two matrices:
+
+    .. MATH::
+
+        A = \\begin{pmatrix}
+            2&0\\\\
+            3&1\\\\
+            \end{pmatrix}
+
+        B = \\begin{pmatrix}
+            2&3\\\\
+            0&1\\\\
+            \end{pmatrix}
+
+    There is a single Nash equilibria for this at which both thieves defect.
+    This can be implemented in Sage using the following::
 
         sage: g = game_theory.PrisonersDilemma()
         sage: g
