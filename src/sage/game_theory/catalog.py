@@ -13,7 +13,7 @@ from sage.matrix.constructor import matrix
 from sage.functions.generalized import sign
 
 
-def PrisonersDilemma(R=-2, P=-4, S=0, T=-5):
+def PrisonersDilemma(R=-2, P=-4, S=-5, T=0):
     r"""
     Return a Prisoners dilemma game.
 
@@ -31,16 +31,21 @@ def PrisonersDilemma(R=-2, P=-4, S=0, T=-5):
 
         A = \begin{pmatrix}
             R&S\\
-            P&T\\
+            T&P\\
             \end{pmatrix}
 
 
         B = \begin{pmatrix}
-            R&P\\
-            S&T\\
+            R&T\\
+            S&P\\
             \end{pmatrix}
 
     Where :math:`T > R > P > S`.
+
+    - :math:`R` denotes the reward received for cooperating.
+    - :math:`S` denotes the 'sucker' utility.
+    - :math:`P` denotes the utility for punishing the other player.
+    - :math:`T` denotes the temptation payoff.
 
     An often used version is the following:
 
@@ -66,22 +71,24 @@ def PrisonersDilemma(R=-2, P=-4, S=0, T=-5):
         sage: g.obtain_nash()
         [[(0, 1), (0, 1)]]
 
-    Note that we can pass other values of R, P, S, T:
+    Note that we can pass other values of R, P, S, T::
 
-        sage: g = game_theory.PrisonersDilemma(R=-1, P=-2, S=0, T=-3)
+        sage: g = game_theory.PrisonersDilemma(R=-1, P=-2, S=-3, T=0)
         sage: g
-        Prisoners dilemma: Normal Form Game with the following utilities: {(0, 1): [-3, 0], (1, 0): [0, -3], (0, 0): [-1, -1], (1, 1): [-3, -3]}
+        Prisoners dilemma: Normal Form Game with the following utilities: {(0, 1): [-3, 0], (1, 0): [0, -3], (0, 0): [-1, -1], (1, 1): [-2, -2]}
         sage: g.obtain_nash()
         [[(0, 1), (0, 1)]]
 
-    If we pass values that fail the defining requirement: :math:`T > R > P > S` we get an error message:
+    If we pass values that fail the defining requirement: :math:`T > R > P > S` we get an error message::
 
         sage: g = game_theory.PrisonersDilemma(R=-1, P=-2, S=0, T=5)
         Traceback (most recent call last):
         ...
         TypeError: The input values for a Prisoners Dilemma must be of the form T > R > P > S.
     """
-    A = matrix([[R, P], [S, T]])
+    if not (T > R > P > S):
+        raise TypeError("The input values for a Prisoners Dilemma must be of the form T > R > P > S.")
+    A = matrix([[R, S], [T, P]])
     g = NormalFormGame([A, A.transpose()])
     g.rename('Prisoners dilemma: ' + repr(g))
     return g
