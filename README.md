@@ -1,5 +1,7 @@
 # Sage: Open Source Mathematical Software (Game Theory Dev Repo)
 
+[![Join the chat at https://gitter.im/theref/sage-game-theory](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/theref/sage-game-theory?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 > "Creating a Viable Open Source Alternative to
 >     Magma, Maple, Mathematica, and MATLAB"
 
