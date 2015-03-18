@@ -20,14 +20,6 @@ authors.
 
 **This is the working repository for game theoretical development in Sage. For the main Sage repository see [https://github.com/sagemath/sage](https://github.com/sagemath/sage).**
 
-The current open tickets for game theory can be found (which correspond to branches in this repository) below:
-
-- 16331: Build capacity to solve matching games in to Sage: [http://trac.sagemath.org/ticket/16331](http://trac.sagemath.org/ticket/16331)
-- 16332: Build capacity to calculate Shapley value of cooperative games: [http://trac.sagemath.org/ticket/16332](http://trac.sagemath.org/ticket/16332)
-- 16333: Build class for normal form games as well as ability to obtain Nash equilibria: [http://trac.sagemath.org/ticket/16333](http://trac.sagemath.org/ticket/16333)
-
-If you would like to contribute, please see the discussions at the relevant tickets above and/or fork this repository.
-
 Current contributors:
 
 - James Campbell (Cardiff)
