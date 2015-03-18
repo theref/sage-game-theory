@@ -47,7 +47,7 @@ def PrisonersDilemma(R=-2, P=-4, S=-5, T=0):
     - :math:`P` denotes the utility for punishing the other player.
     - :math:`T` denotes the temptation payoff.
 
-    An often used version is the following:
+    an often used version is the following:
 
     .. math::
 
@@ -91,6 +91,81 @@ def PrisonersDilemma(R=-2, P=-4, S=-5, T=0):
     A = matrix([[R, S], [T, P]])
     g = NormalFormGame([A, A.transpose()])
     g.rename('Prisoners dilemma: ' + repr(g))
+    return g
+
+
+def CoordinationGame(A=10, a=5, B=0, b=0, C=0, c=0, D=5, d=10):
+    r"""
+    Return a 2 by 2 Coordination Game
+
+    A coordination game is a particualar type of game where the pure Nash
+    equilibria is for the players to pick the same strategies (or equivalent)
+    strategies.
+
+    In general these are represented as a normal form game using the
+    following two matrices:
+
+    .. math::
+
+        A = \begin{pmatrix}
+            A&B\\
+            C&D\\
+            \end{pmatrix}
+
+        B = \begin{pmatrix}
+            a&b\\
+            c&d\\
+            \end{pmatrix}
+
+    Where :math:`A > B, D > C` and :math:`a > c, d > b`.
+
+    An often used version is the following:
+
+    .. math::
+
+        A = \begin{pmatrix}
+            10&0\\
+            0&5\\
+            \end{pmatrix}
+
+
+        B = \begin{pmatrix}
+            5&0\\
+            0&10\\
+            \end{pmatrix}
+
+    This is the default version of the game created by this function::
+
+        sage: g = game_theory.CoordinationGame()
+        sage: g
+        Coordination game: Normal Form Game with the following utilities: {(0, 1): [0, 0], (1, 0): [0, 0], (0, 0): [10, 5], (1, 1): [5, 10]}
+
+    There are two pure Nash equilibria and one mixed::
+
+        sage: g.obtain_nash()
+        [[(0, 1), (0, 1)], [(2/3, 1/3), (1/3, 2/3)], [(1, 0), (1, 0)]]
+
+    We can also pass different values of the input parameters::
+
+        sage: g = game_theory.CoordinationGame(A=9, a=6, B=0, b=1, C=2, c=1, D=4, d=11)
+        sage: g
+        Coordination game: Normal Form Game with the following utilities: {(0, 1): [0, 1], (1, 0): [2, 1], (0, 0): [9, 6], (1, 1): [4, 11]}
+        sage: g.obtain_nash()
+        [[(0, 1), (0, 1)], [(2/3, 1/3), (4/11, 7/11)], [(1, 0), (1, 0)]]
+
+    Note that an error is returned if the defining inequality is not obeyed :math:`A > B, D > C` and :math:`a > c, d > b`::
+
+        sage: g = game_theory.CoordinationGame(A=9, a=6, B=0, b=1, C=2, c=10, D=4, d=11)
+        Traceback (most recent call last):
+        ...
+        TypeError: The input values for a Coordination game must be of the form A > B, D > C, a > c and d > b.
+    """
+    if not (A > B  and  D > C and a > c and d > b):
+        raise TypeError("The input values for a Coordination game must be of the form A > B, D > C, a > c and d > b.")
+    A = matrix([[A, B], [C, D]])
+    B = matrix([[a, b], [c, d]])
+    g = NormalFormGame([A, B])
+    g.rename('Coordination game: ' + repr(g))
     return g
 
 

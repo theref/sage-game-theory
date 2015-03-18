@@ -8,6 +8,7 @@ the ``tab`` key to see which Normal Form Games are available.
 """
 from sage.game_theory.catalog import BattleOfTheSexes
 from sage.game_theory.catalog import Chicken
+from sage.game_theory.catalog import CoordinationGame
 from sage.game_theory.catalog import HawkDove
 from sage.game_theory.catalog import MatchingPennies
 from sage.game_theory.catalog import Pigs
