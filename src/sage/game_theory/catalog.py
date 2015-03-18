@@ -203,12 +203,12 @@ def BattleOfTheSexes():
 
         sage: g = game_theory.BattleOfTheSexes()
         sage: g
-        Battle of the sexes: Normal Form Game with the following utilities: {(0, 1): [1, 1], (1, 0): [0, 0], (0, 0): [3, 2], (1, 1): [2, 3]}
+        Battle of the sexes - Coordination game: Normal Form Game with the following utilities: {(0, 1): [1, 1], (1, 0): [0, 0], (0, 0): [3, 2], (1, 1): [2, 3]}
         sage: g.obtain_nash()
         [[(0, 1), (0, 1)], [(3/4, 1/4), (1/4, 3/4)], [(1, 0), (1, 0)]]
     """
     g = CoordinationGame(A=3, a=2, B=1, b=1, C=0, c=0, D=2, d=3)
-    g.rename(repr(g).replace('Coordination game: ', 'Battle of the sexes: '))
+    g.rename('Battle of the sexes - ' + repr(g))
     return g
 
 
