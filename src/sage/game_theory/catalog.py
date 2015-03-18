@@ -98,7 +98,7 @@ def CoordinationGame(A=10, a=5, B=0, b=0, C=0, c=0, D=5, d=10):
     r"""
     Return a 2 by 2 Coordination Game
 
-    A coordination game is a particualar type of game where the pure Nash
+    A coordination game is a particular type of game where the pure Nash
     equilibria is for the players to pick the same strategies (or equivalent)
     strategies.
 
@@ -254,6 +254,81 @@ def StagHunt():
     """
     g = CoordinationGame(A=5, a=5, B=4, b=0, C=0, c=4, D=2, d=2)
     g.rename('Stag hunt - ' + repr(g))
+    return g
+
+
+def AntiCoordinationGame(A=3, a=3, B=5, b=1, C=1, c=5, D=0, d=0):
+    r"""
+    Return a 2 by 2 AntiCoordination Game
+
+    An anti coordination game is a particular type of game where the pure Nash
+    equilibria is for the players to pick different strategies (or equivalent)
+    strategies.
+
+    In general these are represented as a normal form game using the
+    following two matrices:
+
+    .. math::
+
+        A = \begin{pmatrix}
+            A&C\\
+            B&D\\
+            \end{pmatrix}
+
+        B = \begin{pmatrix}
+            a&c\\
+            b&d\\
+            \end{pmatrix}
+
+    Where :math:`A < B, D < C` and :math:`a < c, d > b`.
+
+    An often used version is the following:
+
+    .. math::
+
+        A = \begin{pmatrix}
+            3&1\\
+            5&0\\
+            \end{pmatrix}
+
+
+        B = \begin{pmatrix}
+            3&5\\
+            1&0\\
+            \end{pmatrix}
+
+    This is the default version of the game created by this function::
+
+        sage: g = game_theory.AntiCoordinationGame()
+        sage: g
+        Anti coordination game: Normal Form Game with the following utilities: {(0, 1): [1, 5], (1, 0): [5, 1], (0, 0): [3, 3], (1, 1): [0, 0]}
+
+    There are two pure Nash equilibria and one mixed::
+
+        sage: g.obtain_nash()
+        [[(0, 1), (1, 0)], [(1/3, 2/3), (1/3, 2/3)], [(1, 0), (0, 1)]]
+
+    We can also pass different values of the input parameters::
+
+        sage: g = game_theory.AntiCoordinationGame(A=2, a=3, B=4, b=2, C=2, c=8, D=1, d=0)
+        sage: g
+        Anti coordination game: Normal Form Game with the following utilities: {(0, 1): [2, 8], (1, 0): [4, 2], (0, 0): [2, 3], (1, 1): [1, 0]}
+        sage: g.obtain_nash()
+        [[(0, 1), (1, 0)], [(2/7, 5/7), (1/3, 2/3)], [(1, 0), (0, 1)]]
+
+    Note that an error is returned if the defining inequality is not obeyed :math:`A > B, D > C` and :math:`a > c, d > b`::
+
+        sage: g = game_theory.AntiCoordinationGame(A=8, a=3, B=4, b=2, C=2, c=8, D=1, d=0)
+        Traceback (most recent call last):
+        ...
+        TypeError: The input values for an Anti coordination game must be of the form A < B, D < C, a < c and d < b.
+    """
+    if not (A < B  and  D < C and a < c and d < b):
+        raise TypeError("The input values for an Anti coordination game must be of the form A < B, D < C, a < c and d < b.")
+    A = matrix([[A, C], [B, D]])
+    B = matrix([[a, c], [b, d]])
+    g = NormalFormGame([A, B])
+    g.rename('Anti coordination game: ' + repr(g))
     return g
 
 
