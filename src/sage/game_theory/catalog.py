@@ -108,13 +108,13 @@ def CoordinationGame(A=10, a=5, B=0, b=0, C=0, c=0, D=5, d=10):
     .. math::
 
         A = \begin{pmatrix}
-            A&B\\
-            C&D\\
+            A&C\\
+            B&D\\
             \end{pmatrix}
 
         B = \begin{pmatrix}
-            a&b\\
-            c&d\\
+            a&c\\
+            b&d\\
             \end{pmatrix}
 
     Where :math:`A > B, D > C` and :math:`a > c, d > b`.
@@ -147,7 +147,7 @@ def CoordinationGame(A=10, a=5, B=0, b=0, C=0, c=0, D=5, d=10):
 
     We can also pass different values of the input parameters::
 
-        sage: g = game_theory.CoordinationGame(A=9, a=6, B=0, b=1, C=2, c=1, D=4, d=11)
+        sage: g = game_theory.CoordinationGame(A=9, a=6, B=2, b=1, C=0, c=1, D=4, d=11)
         sage: g
         Coordination game: Normal Form Game with the following utilities: {(0, 1): [0, 1], (1, 0): [2, 1], (0, 0): [9, 6], (1, 1): [4, 11]}
         sage: g.obtain_nash()
@@ -162,8 +162,8 @@ def CoordinationGame(A=10, a=5, B=0, b=0, C=0, c=0, D=5, d=10):
     """
     if not (A > B  and  D > C and a > c and d > b):
         raise TypeError("The input values for a Coordination game must be of the form A > B, D > C, a > c and d > b.")
-    A = matrix([[A, B], [C, D]])
-    B = matrix([[a, b], [c, d]])
+    A = matrix([[A, C], [B, D]])
+    B = matrix([[a, c], [b, d]])
     g = NormalFormGame([A, B])
     g.rename('Coordination game: ' + repr(g))
     return g
@@ -207,8 +207,53 @@ def BattleOfTheSexes():
         sage: g.obtain_nash()
         [[(0, 1), (0, 1)], [(3/4, 1/4), (1/4, 3/4)], [(1, 0), (1, 0)]]
     """
-    g = CoordinationGame(A=3, a=2, B=1, b=1, C=0, c=0, D=2, d=3)
+    g = CoordinationGame(A=3, a=2, B=0, b=0, C=1, c=1, D=2, d=3)
     g.rename('Battle of the sexes - ' + repr(g))
+    return g
+
+
+def StagHunt():
+    r"""
+    Return a Stag Hunt game.
+
+    Assume two friends go out on a hunt. Each can individually choose to hunt
+    a stag or hunt a hare. Each player must choose an action without knowing
+    the choice of the other. If an individual hunts a stag, he must have the
+    cooperation of his partner in order to succeed. An individual can get a
+    hare by himself, but a hare is worth less than a stag.
+
+    This can be modeled as a normal form game using the following two matrices:
+
+    .. math::
+
+        A = \begin{pmatrix}
+            5&0\\
+            4&2\\
+            \end{pmatrix}
+
+
+        B = \begin{pmatrix}
+            5&4\\
+            0&2\\
+            \end{pmatrix}
+
+    This is a particular type of Coordination Game.
+    There are three Nash equilibria:
+
+        1. Both friends hunting the stag.
+        2. Both friends hunting the hare.
+        3. Both friends hunting the stag 2/3rds of the time.
+
+    This can be implemented in Sage using the following::
+
+        sage: g = game_theory.StagHunt()
+        sage: g
+        Stag hunt - Coordination game: Normal Form Game with the following utilities: {(0, 1): [0, 4], (1, 0): [4, 0], (0, 0): [5, 5], (1, 1): [2, 2]}
+        sage: g.obtain_nash()
+        [[(0, 1), (0, 1)], [(2/3, 1/3), (2/3, 1/3)], [(1, 0), (1, 0)]]
+    """
+    g = CoordinationGame(A=5, a=5, B=4, b=0, C=0, c=4, D=2, d=2)
+    g.rename('Stag hunt - ' + repr(g))
     return g
 
 
@@ -238,9 +283,8 @@ def HawkDove():
 
     There are three Nash equilibria:
 
-        1. Both birds act like Hawks;
-        2. Both birds act like Doves;
-        3. Both birds are equally likely to act like a Hawk of a Dove.
+        1. One bird acts like a Hawk and the other like a Dove.
+        2. Both birds are equally likely to act like a Hawk of a Dove.
 
     This can be implemented in Sage using the following::
 
@@ -440,50 +484,6 @@ def RPSLS():
     g.rename('Rock-Paper-Scissors-Lizard-Spock: ' + repr(g))
     return g
 
-def StagHunt():
-    r"""
-    Return a Stag Hunt game.
-
-    Assume two friends go out on a hunt. Each can individually choose to hunt
-    a stag or hunt a hare. Each player must choose an action without knowing
-    the choice of the other. If an individual hunts a stag, he must have the
-    cooperation of his partner in order to succeed. An individual can get a
-    hare by himself, but a hare is worth less than a stag.
-
-    This can be modeled as a normal form game using the following two matrices:
-
-    .. math::
-
-        A = \begin{pmatrix}
-            5&0\\
-            4&2\\
-            \end{pmatrix}
-
-
-        B = \begin{pmatrix}
-            5&4\\
-            0&2\\
-            \end{pmatrix}
-
-
-    There are three Nash equilibria:
-
-        1. Both friends hunting the stag.
-        2. Both friends hunting the hare.
-        3. Both friends hunting the stag 2/3rds of the time.
-
-    This can be implemented in Sage using the following::
-
-        sage: g = game_theory.StagHunt()
-        sage: g
-        Stag Hunt: Normal Form Game with the following utilities: {(0, 1): [0, 4], (1, 0): [4, 0], (0, 0): [5, 5], (1, 1): [2, 2]}
-        sage: g.obtain_nash()
-        [[(0, 1), (0, 1)], [(2/3, 1/3), (2/3, 1/3)], [(1, 0), (1, 0)]]
-    """
-    A = matrix([[5, 0], [4, 2]])
-    g = NormalFormGame([A, A.transpose()])
-    g.rename('Stag Hunt: ' + repr(g))
-    return g
 
 def Chicken():
     r"""
