@@ -192,6 +192,7 @@ def BattleOfTheSexes():
             0&3\\
             \end{pmatrix}
 
+    This is a particular type of Coordination Game.
     There are three Nash equilibria:
 
     1. Amy and Bob both play video games;
@@ -206,10 +207,8 @@ def BattleOfTheSexes():
         sage: g.obtain_nash()
         [[(0, 1), (0, 1)], [(3/4, 1/4), (1/4, 3/4)], [(1, 0), (1, 0)]]
     """
-    A = matrix([[3, 1], [0, 2]])
-    B = matrix([[2, 1], [0, 3]])
-    g = NormalFormGame([A, B])
-    g.rename('Battle of the sexes: ' + repr(g))
+    g = CoordinationGame(A=3, a=2, B=1, b=1, C=0, c=0, D=2, d=3)
+    g.rename(repr(g).replace('Coordination game: ', 'Battle of the sexes: '))
     return g
 
 
