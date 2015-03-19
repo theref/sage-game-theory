@@ -707,7 +707,7 @@ def TravellersDilemma(max_value=10):
 
     .. [Basu] Kaushik Basu.
        *The Traveler's Dilemma: Paradoxes of Rationality in Game Theory*
-       The American Economic Review
+       The American Economic Review (1994): 391-395
     """
     A = matrix([[min(i, j) + 2 * sign(j - i) for j in range(max_value, 1, -1)] for i in range(max_value, 1, -1)])
     g = NormalFormGame([A, A.transpose()])
