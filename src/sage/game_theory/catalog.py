@@ -652,7 +652,8 @@ def TravellersDilemma(max_value=10):
     strategy should both travelers follow to decide the value they should
     write down?
 
-    This can be modeled as a normal form game using the following two matrices:
+    This can be modeled as a normal form game using the following two matrices
+    [Basu]_:
 
     .. math::
 
@@ -701,6 +702,12 @@ def TravellersDilemma(max_value=10):
         Travellers dilemma: Normal Form Game with the following utilities: {(0, 1): [2, 6], (1, 2): [1, 5], (3, 2): [4, 0], (0, 0): [5, 5], (3, 3): [2, 2], (3, 0): [4, 0], (3, 1): [4, 0], (2, 1): [5, 1], (0, 2): [1, 5], (2, 0): [5, 1], (1, 3): [0, 4], (2, 3): [0, 4], (2, 2): [3, 3], (1, 0): [6, 2], (0, 3): [0, 4], (1, 1): [4, 4]}
         sage: g.obtain_nash()
         [[(0, 0, 0, 1), (0, 0, 0, 1)]]
+
+    REFERENCES:
+
+    .. [Basu] Kaushik Basu.
+       *The Traveler's Dilemma: Paradoxes of Rationality in Game Theory*
+       The American Economic Review
     """
     A = matrix([[min(i, j) + 2 * sign(j - i) for j in range(max_value, 1, -1)] for i in range(max_value, 1, -1)])
     g = NormalFormGame([A, A.transpose()])
