@@ -392,13 +392,14 @@ def HawkDove():
 
         sage: g = game_theory.HawkDove()
         sage: g
-        Hawk-Dove: Normal Form Game with the following utilities: {(0, 1): [3, 1], (1, 0): [1, 3], (0, 0): [0, 0], (1, 1): [2, 2]}
+        Hawk-Dove - Anti coordination game: Normal Form Game with the following utilities: {(0, 1): [3, 1], (1, 0): [1, 3], (0, 0): [0, 0], (1, 1): [2, 2]}
         sage: g.obtain_nash()
         [[(0, 1), (1, 0)], [(1/2, 1/2), (1/2, 1/2)], [(1, 0), (0, 1)]]
     """
-    A = matrix([[0, 3], [1, 2]])
-    g = NormalFormGame([A, A.transpose()])
-    g.rename('Hawk-Dove: ' + repr(g))
+    # A = matrix([[0, 3], [1, 2]])
+    # g = NormalFormGame([A, A.transpose()])
+    g = AntiCoordinationGame(A=0, a=0, B=1, b=3, C=3, c=1, D=2, d=2)
+    g.rename('Hawk-Dove - ' + repr(g))
     return g
 
 
