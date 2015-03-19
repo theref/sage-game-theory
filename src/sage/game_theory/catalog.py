@@ -368,7 +368,8 @@ def HawkDove():
     Hawks always fight over the resource to the point of exterminating a
     fellow hawk and/or take a majority of the resource from a dove.
     Two doves can share the resource.
-    This can be modeled as a normal form game using the following two matrices:
+    This can be modeled as a normal form game using the following two matrices
+    [Cressman]_:
 
     .. math::
 
@@ -396,6 +397,12 @@ def HawkDove():
         Hawk-Dove - Anti coordination game: Normal Form Game with the following utilities: {(0, 1): [3, 1], (1, 0): [1, 3], (0, 0): [0, 0], (1, 1): [2, 2]}
         sage: g.obtain_nash()
         [[(0, 1), (1, 0)], [(1/2, 1/2), (1/2, 1/2)], [(1, 0), (0, 1)]]
+
+    REFERENCES:
+
+    .. [Cressman] Cressman, Ross.
+       *Evolutionary dynamics and extensive form games*
+       MIT Press
     """
     g = AntiCoordinationGame(A=0, a=0, B=1, b=3, C=3, c=1, D=2, d=2)
     g.rename('Hawk-Dove - ' + repr(g))
