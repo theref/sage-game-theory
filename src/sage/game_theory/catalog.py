@@ -25,7 +25,8 @@ def PrisonersDilemma(R=-2, P=-4, S=-5, T=0):
     long sentence.
     If they both defect they both get a medium length sentence.
 
-    This can be modeled as a normal form game using the following two matrices:
+    This can be modeled as a normal form game using the following two matrices
+    [Webb]_:
 
     .. math::
 
@@ -47,7 +48,7 @@ def PrisonersDilemma(R=-2, P=-4, S=-5, T=0):
     - :math:`P` denotes the utility for punishing the other player.
     - :math:`T` denotes the temptation payoff.
 
-    an often used version is the following:
+    an often used version [Webb]_ is the following:
 
     .. math::
 
@@ -85,6 +86,12 @@ def PrisonersDilemma(R=-2, P=-4, S=-5, T=0):
         Traceback (most recent call last):
         ...
         TypeError: The input values for a Prisoners Dilemma must be of the form T > R > P > S.
+
+    REFERENCES:
+
+    .. [Webb] James Webb.
+       *Game theory: decisions, interaction and Evolution*
+       Springer Science & Business Media
     """
     if not (T > R > P > S):
         raise TypeError("The input values for a Prisoners Dilemma must be of the form T > R > P > S.")
@@ -100,7 +107,7 @@ def CoordinationGame(A=10, a=5, B=0, b=0, C=0, c=0, D=5, d=10):
 
     A coordination game is a particular type of game where the pure Nash
     equilibria is for the players to pick the same strategies (or equivalent)
-    strategies.
+    strategies [Webb]_.
 
     In general these are represented as a normal form game using the
     following two matrices:
@@ -159,6 +166,12 @@ def CoordinationGame(A=10, a=5, B=0, b=0, C=0, c=0, D=5, d=10):
         Traceback (most recent call last):
         ...
         TypeError: The input values for a Coordination game must be of the form A > B, D > C, a > c and d > b.
+
+    REFERENCES:
+
+    .. [Webb] James Webb.
+       *Game theory: decisions, interaction and Evolution*
+       Springer Science & Business Media
     """
     if not (A > B  and  D > C and a > c and d > b):
         raise TypeError("The input values for a Coordination game must be of the form A > B, D > C, a > c and d > b.")
@@ -177,7 +190,8 @@ def BattleOfTheSexes():
     Amy prefers to play video games and Bob prefers to
     watch a movie. They both however want to spend their evening
     together.
-    This can be modeled as a normal form game using the following two matrices:
+    This can be modeled as a normal form game using the following two matrices
+    [Webb]_:
 
     .. math::
 
@@ -206,6 +220,12 @@ def BattleOfTheSexes():
         Battle of the sexes - Coordination game: Normal Form Game with the following utilities: {(0, 1): [1, 1], (1, 0): [0, 0], (0, 0): [3, 2], (1, 1): [2, 3]}
         sage: g.obtain_nash()
         [[(0, 1), (0, 1)], [(3/4, 1/4), (1/4, 3/4)], [(1, 0), (1, 0)]]
+
+    REFERENCES:
+
+    .. [Webb] James Webb.
+       *Game theory: decisions, interaction and Evolution*
+       Springer Science & Business Media
     """
     g = CoordinationGame(A=3, a=2, B=0, b=0, C=1, c=1, D=2, d=3)
     g.rename('Battle of the sexes - ' + repr(g))
@@ -222,7 +242,8 @@ def StagHunt():
     cooperation of his partner in order to succeed. An individual can get a
     hare by himself, but a hare is worth less than a stag.
 
-    This can be modeled as a normal form game using the following two matrices:
+    This can be modeled as a normal form game using the following two matrices
+    [Skyrms]_:
 
     .. math::
 
@@ -251,6 +272,12 @@ def StagHunt():
         Stag hunt - Coordination game: Normal Form Game with the following utilities: {(0, 1): [0, 4], (1, 0): [4, 0], (0, 0): [5, 5], (1, 1): [2, 2]}
         sage: g.obtain_nash()
         [[(0, 1), (0, 1)], [(2/3, 1/3), (2/3, 1/3)], [(1, 0), (1, 0)]]
+
+    REFERENCES:
+
+    .. [Skyrms] Brian Skyrms.
+       *The stag hunt and the evolution of social structure*
+       Cambridge University Press
     """
     g = CoordinationGame(A=5, a=5, B=4, b=0, C=0, c=4, D=2, d=2)
     g.rename('Stag hunt - ' + repr(g))
