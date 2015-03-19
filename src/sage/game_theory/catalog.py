@@ -396,8 +396,6 @@ def HawkDove():
         sage: g.obtain_nash()
         [[(0, 1), (1, 0)], [(1/2, 1/2), (1/2, 1/2)], [(1, 0), (0, 1)]]
     """
-    # A = matrix([[0, 3], [1, 2]])
-    # g = NormalFormGame([A, A.transpose()])
     g = AntiCoordinationGame(A=0, a=0, B=1, b=3, C=3, c=1, D=2, d=2)
     g.rename('Hawk-Dove - ' + repr(g))
     return g
@@ -622,12 +620,11 @@ def Chicken():
 
         sage: g = game_theory.Chicken()
         sage: g
-        Chicken: Normal Form Game with the following utilities: {(0, 1): [-1, 1], (1, 0): [1, -1], (0, 0): [0, 0], (1, 1): [-10, -10]}
+        Chicken: Anti coordination game: Normal Form Game with the following utilities: {(0, 1): [-1, 1], (1, 0): [1, -1], (0, 0): [0, 0], (1, 1): [-10, -10]}
         sage: g.obtain_nash()
         [[(0, 1), (1, 0)], [(9/10, 1/10), (9/10, 1/10)], [(1, 0), (0, 1)]]
     """
-    A = matrix([[0, -1], [1, -10]])
-    g = NormalFormGame([A, A.transpose()])
+    g = AntiCoordinationGame(A=0, a=0, B=1, b=-1, C=-1, c=1, D=-10, d=-10)
     g.rename('Chicken: ' + repr(g))
     return g
 
