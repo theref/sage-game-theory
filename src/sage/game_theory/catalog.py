@@ -383,6 +383,7 @@ def HawkDove():
             3&2\\
             \end{pmatrix}
 
+    This is a particular example of an anti coordination game.
     There are three Nash equilibria:
 
         1. One bird acts like a Hawk and the other like a Dove.
@@ -609,7 +610,7 @@ def Chicken():
             -1&-10\\
             \end{pmatrix}
 
-
+    This is a particular example of an anti coordination game.
     There are three Nash equilibria:
 
         1. The second player swerving
