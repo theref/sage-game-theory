@@ -418,19 +418,19 @@ def Pigs():
     Finally if both pigs go to push the lever the subservient pig will be
     able to eat a third of the food.
 
-    This can be modeled as a normal form game using the following two matrices:
+    This can be modeled as a normal form game using the following two matrices [McMillan]_:
 
     .. math::
 
         A = \begin{pmatrix}
-            4&2\\
-            6&0\\
+            1.5&-0.5\\
+            5&0\\
             \end{pmatrix}
 
 
         B = \begin{pmatrix}
-            2&3\\
-            -1&0\\
+            3.5&6\\
+            .5&0\\
             \end{pmatrix}
 
     There is a single Nash equilibrium at which the dominant pig pushes the
@@ -443,9 +443,15 @@ def Pigs():
         Pigs: Normal Form Game with the following utilities: {(0, 1): [2, 3], (1, 0): [6, -1], (0, 0): [4, 2], (1, 1): [0, 0]}
         sage: g.obtain_nash()
         [[(1, 0), (0, 1)]]
+
+    REFERENCES:
+
+    .. [McMillan] John McMillan.
+       *Games, strategies, and managers.*
+       Oxford University Press
     """
-    A = matrix([[4, 2], [6, 0]])
-    B = matrix([[2, 3], [-1, 0]])
+    A = matrix([[1.5, -0.5], [5, 0]])
+    B = matrix([[3.5, 6], [0.5, 0]])
     g = NormalFormGame([A, B])
     g.rename('Pigs: ' + repr(g))
     return g
