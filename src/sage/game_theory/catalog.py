@@ -4,6 +4,34 @@ Documentation for the game theory catalog
 A catalog of named normal form games.
 The docstrings give an interpretation of the situation they model.
 
+More information is available in the following references:
+
+REFERENCES:
+
+.. [Basu] Kaushik Basu.
+   *The Traveler's Dilemma: Paradoxes of Rationality in Game Theory*
+   The American Economic Review (1994): 391-395
+
+.. [Cressman] Cressman, Ross.
+   *Evolutionary dynamics and extensive form games*
+   MIT Press
+
+.. [McMillan] John McMillan.
+   *Games, strategies, and managers.*
+   Oxford University Press
+
+.. [Skyrms] Brian Skyrms.
+   *The stag hunt and the evolution of social structure*
+   Cambridge University Press
+
+.. [Watson] Joel Watson.
+   *Strategy: an introduction to game theory.*
+   WW Norton
+
+.. [Webb] James Webb.
+   *Game theory: decisions, interaction and Evolution*
+   Springer Science & Business Media
+
 AUTHOR:
 
 - James Campbell and Vince Knight (06-2014)
@@ -87,11 +115,6 @@ def PrisonersDilemma(R=-2, P=-4, S=-5, T=0):
         ...
         TypeError: The input values for a Prisoners Dilemma must be of the form T > R > P > S.
 
-    REFERENCES:
-
-    .. [Webb] James Webb.
-       *Game theory: decisions, interaction and Evolution*
-       Springer Science & Business Media
     """
     if not (T > R > P > S):
         raise TypeError("The input values for a Prisoners Dilemma must be of the form T > R > P > S.")
@@ -166,12 +189,6 @@ def CoordinationGame(A=10, a=5, B=0, b=0, C=0, c=0, D=5, d=10):
         Traceback (most recent call last):
         ...
         TypeError: The input values for a Coordination game must be of the form A > B, D > C, a > c and d > b.
-
-    REFERENCES:
-
-    .. [Webb] James Webb.
-       *Game theory: decisions, interaction and Evolution*
-       Springer Science & Business Media
     """
     if not (A > B  and  D > C and a > c and d > b):
         raise TypeError("The input values for a Coordination game must be of the form A > B, D > C, a > c and d > b.")
@@ -220,12 +237,6 @@ def BattleOfTheSexes():
         Battle of the sexes - Coordination game: Normal Form Game with the following utilities: {(0, 1): [1, 1], (1, 0): [0, 0], (0, 0): [3, 2], (1, 1): [2, 3]}
         sage: g.obtain_nash()
         [[(0, 1), (0, 1)], [(3/4, 1/4), (1/4, 3/4)], [(1, 0), (1, 0)]]
-
-    REFERENCES:
-
-    .. [Webb] James Webb.
-       *Game theory: decisions, interaction and Evolution*
-       Springer Science & Business Media
     """
     g = CoordinationGame(A=3, a=2, B=0, b=0, C=1, c=1, D=2, d=3)
     g.rename('Battle of the sexes - ' + repr(g))
@@ -273,11 +284,6 @@ def StagHunt():
         sage: g.obtain_nash()
         [[(0, 1), (0, 1)], [(2/3, 1/3), (2/3, 1/3)], [(1, 0), (1, 0)]]
 
-    REFERENCES:
-
-    .. [Skyrms] Brian Skyrms.
-       *The stag hunt and the evolution of social structure*
-       Cambridge University Press
     """
     g = CoordinationGame(A=5, a=5, B=4, b=0, C=0, c=4, D=2, d=2)
     g.rename('Stag hunt - ' + repr(g))
@@ -398,11 +404,6 @@ def HawkDove():
         sage: g.obtain_nash()
         [[(0, 1), (1, 0)], [(1/2, 1/2), (1/2, 1/2)], [(1, 0), (0, 1)]]
 
-    REFERENCES:
-
-    .. [Cressman] Cressman, Ross.
-       *Evolutionary dynamics and extensive form games*
-       MIT Press
     """
     g = AntiCoordinationGame(A=-1, a=-1, B=0, b=2, C=2, c=0, D=1, d=1)
     g.rename('Hawk-Dove - ' + repr(g))
@@ -451,11 +452,6 @@ def Pigs():
         sage: g.obtain_nash()
         [[(0, 1), (1, 0)]]
 
-    REFERENCES:
-
-    .. [McMillan] John McMillan.
-       *Games, strategies, and managers.*
-       Oxford University Press
     """
     A = matrix([[1.5, -0.5], [5, 0]])
     B = matrix([[3.5, 6], [0.5, 0]])
@@ -493,12 +489,6 @@ def MatchingPennies():
         Matching pennies: Normal Form Game with the following utilities: {(0, 1): [-1, 1], (1, 0): [-1, 1], (0, 0): [1, -1], (1, 1): [1, -1]}
         sage: g.obtain_nash()
         [[(1/2, 1/2), (1/2, 1/2)]]
-
-    REFERENCES:
-
-    .. [Webb] James Webb.
-       *Game theory: decisions, interaction and Evolution*
-       Springer Science & Business Media
     """
     A = matrix([[1, -1], [-1, 1]])
     g = NormalFormGame([A])
@@ -542,12 +532,6 @@ def RPS():
         Rock-Paper-Scissors: Normal Form Game with the following utilities: {(0, 1): [-1, 1], (1, 2): [-1, 1], (0, 0): [0, 0], (2, 1): [1, -1], (1, 1): [0, 0], (2, 0): [-1, 1], (2, 2): [0, 0], (1, 0): [1, -1], (0, 2): [1, -1]}
         sage: g.obtain_nash()
         [[(1/3, 1/3, 1/3), (1/3, 1/3, 1/3)]]
-
-    REFERENCES:
-
-    .. [Webb] James Webb.
-       *Game theory: decisions, interaction and Evolution*
-       Springer Science & Business Media
     """
     A = matrix([[0, -1, 1], [1, 0, -1], [-1, 1, 0]])
     g = NormalFormGame([A])
@@ -649,12 +633,6 @@ def Chicken():
         Chicken: Anti coordination game: Normal Form Game with the following utilities: {(0, 1): [-1, 1], (1, 0): [1, -1], (0, 0): [0, 0], (1, 1): [-10, -10]}
         sage: g.obtain_nash()
         [[(0, 1), (1, 0)], [(9/10, 1/10), (9/10, 1/10)], [(1, 0), (0, 1)]]
-
-    REFERENCES:
-
-    .. [Watson] Joel Watson.
-       *Strategy: an introduction to game theory.*
-       WW Norton
     """
     g = AntiCoordinationGame(A=0, a=0, B=1, b=-1, C=-1, c=1, D=-10, d=-10)
     g.rename('Chicken: ' + repr(g))
@@ -734,11 +712,6 @@ def TravellersDilemma(max_value=10):
         sage: g.obtain_nash()
         [[(0, 0, 0, 1), (0, 0, 0, 1)]]
 
-    REFERENCES:
-
-    .. [Basu] Kaushik Basu.
-       *The Traveler's Dilemma: Paradoxes of Rationality in Game Theory*
-       The American Economic Review (1994): 391-395
     """
     A = matrix([[min(i, j) + 2 * sign(j - i) for j in range(max_value, 1, -1)] for i in range(max_value, 1, -1)])
     g = NormalFormGame([A, A.transpose()])
