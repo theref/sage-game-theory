@@ -447,9 +447,9 @@ def Pigs():
 
         sage: g = game_theory.Pigs()
         sage: g
-        Pigs: Normal Form Game with the following utilities: {(0, 1): [2, 3], (1, 0): [6, -1], (0, 0): [4, 2], (1, 1): [0, 0]}
+        Pigs: Normal Form Game with the following utilities: {(0, 1): [-0.5, 6.0], (1, 0): [5.0, 0.5], (0, 0): [1.5, 3.5], (1, 1): [0.0, 0.0]}
         sage: g.obtain_nash()
-        [[(1, 0), (0, 1)]]
+        [[(0, 1), (1, 0)]]
 
     REFERENCES:
 
@@ -474,7 +474,7 @@ def MatchingPennies():
     if not then player 2 wins.
 
     This can be modeled as a zero sum normal form game with the following
-    matrix:
+    matrix [Webb]_:
 
     .. math::
 
@@ -493,6 +493,12 @@ def MatchingPennies():
         Matching pennies: Normal Form Game with the following utilities: {(0, 1): [-1, 1], (1, 0): [-1, 1], (0, 0): [1, -1], (1, 1): [1, -1]}
         sage: g.obtain_nash()
         [[(1/2, 1/2), (1/2, 1/2)]]
+
+    REFERENCES:
+
+    .. [Webb] James Webb.
+       *Game theory: decisions, interaction and Evolution*
+       Springer Science & Business Media
     """
     A = matrix([[1, -1], [-1, 1]])
     g = NormalFormGame([A])
@@ -519,7 +525,7 @@ def RPS():
     Scissors.
 
     This can be modeled as a zero sum normal form game with the following
-    matrix:
+    matrix [Webb]_:
 
     .. math::
 
@@ -536,6 +542,12 @@ def RPS():
         Rock-Paper-Scissors: Normal Form Game with the following utilities: {(0, 1): [-1, 1], (1, 2): [-1, 1], (0, 0): [0, 0], (2, 1): [1, -1], (1, 1): [0, 0], (2, 0): [-1, 1], (2, 2): [0, 0], (1, 0): [1, -1], (0, 2): [1, -1]}
         sage: g.obtain_nash()
         [[(1/3, 1/3, 1/3), (1/3, 1/3, 1/3)]]
+
+    REFERENCES:
+
+    .. [Webb] James Webb.
+       *Game theory: decisions, interaction and Evolution*
+       Springer Science & Business Media
     """
     A = matrix([[0, -1, 1], [1, 0, -1], [-1, 1, 0]])
     g = NormalFormGame([A])
@@ -608,7 +620,7 @@ def Chicken():
     towards a cliff and the winner is declared as the last one to swerve.
     If neither player swerves they will both fall off the cliff.
 
-    This can be modeled as a normal form game using the following two matrices:
+    This can be modeled as a normal form game using the following two matrices [Watson]_:
 
     .. math::
 
@@ -637,6 +649,12 @@ def Chicken():
         Chicken: Anti coordination game: Normal Form Game with the following utilities: {(0, 1): [-1, 1], (1, 0): [1, -1], (0, 0): [0, 0], (1, 1): [-10, -10]}
         sage: g.obtain_nash()
         [[(0, 1), (1, 0)], [(9/10, 1/10), (9/10, 1/10)], [(1, 0), (0, 1)]]
+
+    REFERENCES:
+
+    .. [Watson] Joel Watson.
+       *Strategy: an introduction to game theory.*
+       WW Norton
     """
     g = AntiCoordinationGame(A=0, a=0, B=1, b=-1, C=-1, c=1, D=-10, d=-10)
     g.rename('Chicken: ' + repr(g))
