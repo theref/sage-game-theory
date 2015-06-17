@@ -1465,7 +1465,7 @@ class NormalFormGame(SageObject, MutableMapping):
                 # Check if any supports are dominated for col player
                and self._row_cond_dominance(pair[1], pair[0], M2.transpose())):
                     result = self._solve_indifference(pair[0], pair[1], M1, M2)
-                    if result:
+                    if result and self._is_NE(result[0], result[1], pair[0], pair[1], M1, M2):
                         equilibria.append([tuple(result[0]), tuple(result[1])])
         return sorted(equilibria)
 
@@ -1609,9 +1609,10 @@ class NormalFormGame(SageObject, MutableMapping):
         except ValueError:
             return None
 
-        if self._is_NE(a, b, p1_support, p2_support, M1, M2):
-            return [a, b]
-        return None
+        return [a, b]
+        # if self._is_NE(a, b, p1_support, p2_support, M1, M2):
+        #     return [a, b]
+        # return None
 
     def _is_NE(self, a, b, p1_support, p2_support, M1, M2):
         r"""
@@ -2043,22 +2044,30 @@ class NormalFormGame(SageObject, MutableMapping):
                                powerset(range(player.num_strategies))]
                               for player in self.players]
 
-        potential_support_pairs = [pair for pair in
-                                   CartesianProduct(*potential_supports) if
-                                   len(pair[0]) != len(pair[1])]
+        potential_support_pairs = [pair for pair in CartesianProduct(*potential_supports)]
 
         equilibria = []
         for pair in potential_support_pairs:
             # Check if any supports are dominated for row player
-            if (self._row_cond_dominance(pair[0], pair[1], M1)
+            # if (self._row_cond_dominance(pair[0], pair[1], M1)
                 # Check if any supports are dominated for col player
-               and self._row_cond_dominance(pair[1], pair[0], M2.transpose())):
-                    result = self._solve_indifference(pair[0], pair[1], M1, M2)
-                    if result:
-                        equilibria.append([tuple(result[0]), tuple(result[1])])
+               # and self._row_cond_dominance(pair[1], pair[0], M2.transpose())):
+            result = self._solve_indifference(pair[0], pair[1], M1, M2)
+            if result:
+                a = sum(1 for x in result[0] if x > 0)
+                b = sum(1 for x in result[1] if x > 0)
+                if a != b:
+                    return True
+                equilibria.append(result)
 
-        if equilibria:
-            return True
+        for r in equilibria:
+            eq = equilibria
+            eq.remove(r)
+            if eq:
+                for s in eq:
+                    if r[0] == s[0] or r[1] == s[1]:
+                        return True
+
         return False
 
 
