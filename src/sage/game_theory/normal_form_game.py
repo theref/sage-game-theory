@@ -2048,18 +2048,16 @@ class NormalFormGame(SageObject, MutableMapping):
 
         equilibria = []
         for pair in potential_support_pairs:
-            # Check if any supports are dominated for row player
-            # if (self._row_cond_dominance(pair[0], pair[1], M1)
-                # Check if any supports are dominated for col player
-               # and self._row_cond_dominance(pair[1], pair[0], M2.transpose())):
             result = self._solve_indifference(pair[0], pair[1], M1, M2)
             if result:
+                # check that suppports are the same size
                 a = sum(1 for x in result[0] if x > 0)
                 b = sum(1 for x in result[1] if x > 0)
                 if a != b:
                     return True
                 equilibria.append(result)
 
+        # check that a strategy doesn't have more than one response
         for r in equilibria:
             eq = equilibria
             eq.remove(r)
