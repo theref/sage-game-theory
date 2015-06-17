@@ -1934,6 +1934,110 @@ class NormalFormGame(SageObject, MutableMapping):
 
         return A, B
 
+    def is_degenerate_def(self):
+        """
+        FROM DEFINITION.
+        Uses the definiton and borrows code from enumeration.
+
+        EXAMPLES::
+
+            sage: A = matrix([[3,3],[2,5],[0,6]])
+            sage: B = matrix([[3,3],[2,6],[3,1]])
+            sage: degenerate_game = NormalFormGame([A,B])
+            sage: degenerate_game.is_degenerate_def()
+            True
+
+            sage: A = matrix([[0, 6], [2, 5], [3, 3]])
+            sage: B = matrix([[1, 0], [0, 2], [4, 4]])
+            sage: d_game = NormalFormGame([A, B])
+            sage: d_game.is_degenerate_def()
+            True
+
+            sage: M = matrix([[2, 1], [1, 1]])
+            sage: N = matrix([[1, 1], [1, 2]])
+            sage: game  = NormalFormGame([M, N])
+            sage: game.is_degenerate_def()
+            True
+
+            sage: a = matrix([[-75, 18, 45, 33],
+            ....:            [42, -8, -77, -18],
+            ....:            [83, 18, 11, 40],
+            ....:            [-10, -38, 76, -9]])
+            sage: b = matrix([[62, 64, 87, 51],
+            ....:            [-41, -27, -69, 52],
+            ....:            [-17, 25, -97, -82],
+            ....:            [30, 31, -1, 50]])
+            sage: d_game = NormalFormGame([a, b])
+            sage: d_game.is_degenerate_def()
+            True
+
+        The game Rock-Paper-Scissors is an example of a non-degenerate game.::
+
+            sage: A = matrix([[0, -1, 1],
+            ....:             [1, 0, -1],
+            ....:             [-1, 1, 0]])
+            sage: g = NormalFormGame([A])
+            sage: g.is_degenerate_def()
+            False
+
+        Whereas `Rock-Paper-Scissors-Lizard-Spock
+        <http://www.samkass.com/theories/RPSSL.html>`_ is degenerate because
+        for every pure strategy there are two best responses.::
+
+            sage: A = matrix([[0, -1, 1, 1, -1],
+            ....:             [1, 0, -1, -1, 1],
+            ....:             [-1, 1, 0, 1 , -1],
+            ....:             [-1, 1, -1, 0, 1],
+            ....:             [1, -1, 1, -1, 0]])
+            sage: g = NormalFormGame([A])
+            sage: g.is_degenerate_def()
+            True
+
+        TESTS::
+
+            sage: g = NormalFormGame()
+            sage: g.add_player(3)  # Adding first player with 3 strategies
+            sage: g.add_player(3)  # Adding second player with 3 strategies
+            sage: for key in g:
+            ....:     g[key] = [0, 0]
+            sage: g.is_degenerate_def()
+            True
+
+            sage: A = matrix([[1, -1], [-1, 1]])
+            sage: B = matrix([[-1, 1], [1, -1]])
+            sage: matching_pennies = NormalFormGame([A, B])
+            sage: matching_pennies.is_degenerate_def()
+            False
+
+            sage: A = matrix([[2, 5], [0, 4]])
+            sage: B = matrix([[2, 0], [5, 4]])
+            sage: prisoners_dilemma = NormalFormGame([A, B])
+            sage: prisoners_dilemma.is_degenerate_def()
+            False
+        """
+        M1, M2 = self.payoff_matrices()
+        potential_supports = [[tuple(support) for support in
+                               powerset(range(player.num_strategies))]
+                              for player in self.players]
+
+        potential_support_pairs = [pair for pair in
+                                   CartesianProduct(*potential_supports) if
+                                   len(pair[0]) != len(pair[1])]
+
+        equilibria = []
+        for pair in potential_support_pairs:
+            # Check if any supports are dominated for row player
+            if (self._row_cond_dominance(pair[0], pair[1], M1)
+                # Check if any supports are dominated for col player
+               and self._row_cond_dominance(pair[1], pair[0], M2.transpose())):
+                    result = self._solve_indifference(pair[0], pair[1], M1, M2)
+                    if result:
+                        equilibria.append([tuple(result[0]), tuple(result[1])])
+
+        if equilibria:
+            return True
+        return False
+
 
 class _Player():
     def __init__(self, num_strategies):
