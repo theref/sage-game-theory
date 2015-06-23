@@ -1843,6 +1843,12 @@ class NormalFormGame(SageObject, MutableMapping):
 
         TESTS::
 
+            sage: A = matrix([[1, 0], [0, 1], [0, 0]])
+            sage: B = matrix([[1, 0], [0, 1], [0.7, 0.8]])
+            sage: g = NormalFormGame([A, B])
+            sage: g.is_degenerate_LA()
+            False
+
             sage: g = NormalFormGame()
             sage: g.add_player(3)  # Adding first player with 3 strategies
             sage: g.add_player(3)  # Adding second player with 3 strategies
@@ -1890,6 +1896,7 @@ class NormalFormGame(SageObject, MutableMapping):
                                       "two players.")
 
         M1, M2 = self.payoff_matrices()
+
         m = M1.nrows()
         n = M2.ncols()
         A, B = self._create_label_matrices(M1, M2, m, n)
@@ -2019,6 +2026,12 @@ class NormalFormGame(SageObject, MutableMapping):
 
         TESTS::
 
+            sage: A = matrix([[1, 0], [0, 1], [0, 0]])
+            sage: B = matrix([[1, 0], [0, 1], [0.7, 0.8]])
+            sage: g = NormalFormGame([A, B])
+            sage: g.is_degenerate_def()
+            False
+
             sage: g = NormalFormGame()
             sage: g.add_player(3)  # Adding first player with 3 strategies
             sage: g.add_player(3)  # Adding second player with 3 strategies
@@ -2050,12 +2063,22 @@ class NormalFormGame(SageObject, MutableMapping):
         for pair in potential_support_pairs:
             result = self._solve_indifference(pair[0], pair[1], M1, M2)
             if result:
-                # check that suppports are the same size
-                a = sum(1 for x in result[0] if x > 0)
-                b = sum(1 for x in result[1] if x > 0)
-                if a != b:
+                p1_payoffs = [sum(v * row[i] for i, v in enumerate(result[1]))
+                              for row in M1.rows()]
+                p2_payoffs = [sum(v * col[j] for j, v in enumerate(result[0]))
+                              for col in M2.columns()]
+
+                a = sum(1 for x in result[0] if x != 0)
+                b = sum(1 for x in result[1] if x != 0)
+
+                d = any(i in pair[0] for i, x in enumerate(p1_payoffs) if x == max(p1_payoffs))
+                e = any(i in pair[1] for i, x in enumerate(p2_payoffs) if x == max(p2_payoffs))
+
+                if a != b and d and e:
+                    # print 'a'
                     return True
-                equilibria.append(result)
+                elif a == b:
+                    equilibria.append(result)
 
         # check that a strategy doesn't have more than one response
         for r in equilibria:
