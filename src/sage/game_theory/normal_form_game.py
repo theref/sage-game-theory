@@ -2068,14 +2068,15 @@ class NormalFormGame(SageObject, MutableMapping):
                 p2_payoffs = [sum(v * col[j] for j, v in enumerate(result[0]))
                               for col in M2.columns()]
 
+                # checking non-zero probabilities
                 a = sum(1 for x in result[0] if x != 0)
                 b = sum(1 for x in result[1] if x != 0)
 
+                # check that best payoff is included
                 d = any(i in pair[0] for i, x in enumerate(p1_payoffs) if x == max(p1_payoffs))
                 e = any(i in pair[1] for i, x in enumerate(p2_payoffs) if x == max(p2_payoffs))
 
                 if a != b and d and e:
-                    # print 'a'
                     return True
                 elif a == b:
                     equilibria.append(result)
