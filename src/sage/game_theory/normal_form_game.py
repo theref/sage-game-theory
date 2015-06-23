@@ -2094,6 +2094,8 @@ class NormalFormGame(SageObject, MutableMapping):
 
     def is_degenerate_pure(self):
         """
+        Checks whether a game is degenerate in pure strategies.
+
         TESTS::
 
             sage: A = matrix([[3,3],[2,5],[0,6]])
@@ -2122,6 +2124,15 @@ class NormalFormGame(SageObject, MutableMapping):
             sage: g = NormalFormGame([A])
             sage: g.is_degenerate_pure()
             True
+
+            Whilst this game is not degenerate in pure strategies, it is
+            actually degenerate, but only in mixed strategies.
+
+            sage: A = matrix([[3, 0], [0, 3], [1.5, 1.5]])
+            sage: B = matrix([[4, 3], [2, 6], [3, 1]])
+            sage: g = NormalFormGame([A, B])
+            sage: g.is_degenerate_pure()
+            False
         """
         M1, M2 = self.payoff_matrices()
         for row in M2.rows():
