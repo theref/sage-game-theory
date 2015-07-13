@@ -1234,9 +1234,7 @@ class ExtensiveFormGame():
         while len(current_info_sets)!= 0:
             for info_set in current_info_sets:
                 for node in info_set:
-                    for i,action in enumerate(node.parent.actions):
-                        if node.parent.node_input[action] is node:                        
-                          action_getting_index = i
+                    action_getting_index = self._get_gambit_child_index(node) 
                     gambit_node = parent_dict[node.parent].children[action_getting_index]
                     gambit_node.label = node.name
                     if node is info_set[0]:
@@ -1252,10 +1250,7 @@ class ExtensiveFormGame():
                             for player_index in range(len(self.players)):
                                 player = self.players[player_index]
                                 Outcome[player_index] = int(child[player])
-                            leaf_action_index = 0 
-                            for i,action in enumerate(node.actions):
-                                if node.node_input[action] is child:                        
-                                    leaf_action_index = i                                
+                            leaf_action_index = self._get_gambit_child_index(child)                                                           
                             gambit_node.children[leaf_action_index].outcome = Outcome
                         
                     parent_dict[node] = gambit_node
@@ -1267,6 +1262,22 @@ class ExtensiveFormGame():
                             next_info_sets.append(listed_info_set)
             current_info_sets = set(next_info_sets)
         return g
+
+    def _get_gambit_child_index(self, child_of_sage_node):
+        """
+        A sub-function of ``gambit_convert`` which takes takes a node/leaf with a parent (which has already been converted into a gambit node)
+        and then returns which branch that child should lie on determined by which action took it there. 
+
+        TESTS:
+            need to be added when we have more sub-functions, as it'll be easier to test this one fully with that!
+        """
+        sage_node = child_of_sage_node.parent
+        for i,action in enumerate(sage_node.actions):
+            if sage_node.node_input[action] is child_of_sage_node:                        
+                child_index = i 
+        return child_index
+
+
 
     def obtain_nash(self):
         r"""
@@ -1348,6 +1359,7 @@ class ExtensiveFormGame():
             sage: expected_outcome == egame_a1.obtain_nash()  # optional - gambit
             True
             sage: egame_a1.obtain_nash()
+            
             
 
         """
