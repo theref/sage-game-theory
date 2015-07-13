@@ -1226,6 +1226,7 @@ class ExtensiveFormGame():
         move.label = "(%s)" %self.tree_root
         for index in range(len(self.tree_root.actions)):
             move.actions[index].label = self.tree_root.actions[index]
+        self._add_gambit_outcomes(self.tree_root, gambit_root, g)
         tuple_root = tuple([self.tree_root])
         current_info_sets = d[tuple_root]
         parent_dict = {}
@@ -1244,15 +1245,8 @@ class ExtensiveFormGame():
                             move.actions[action_setting_index].label = node.actions[action_setting_index]
                     else:
                         gambit_node.append_move(move)
-                    for child in node.children:
-                        if isinstance(child, Leaf):
-                            Outcome = g.outcomes.add(child.name)
-                            for player_index in range(len(self.players)):
-                                player = self.players[player_index]
-                                Outcome[player_index] = int(child[player])
-                            leaf_action_index = self._get_gambit_child_index(child)                                                           
-                            gambit_node.children[leaf_action_index].outcome = Outcome
-                        
+                    self._add_gambit_outcomes(node, gambit_node, g)
+
                     parent_dict[node] = gambit_node
             next_info_sets = []
             for info_set in current_info_sets:
@@ -1276,6 +1270,20 @@ class ExtensiveFormGame():
             if sage_node.node_input[action] is child_of_sage_node:                        
                 child_index = i 
         return child_index
+
+    def _add_gambit_outcomes(self, sage_node, gambit_node, gambit_game):
+        """
+        A sub-function of ``gambit_convert`` which takes an already converted gambit node, and searches through its children to determine
+        if any are leaves, then if a child is a leaf it adds its payoffs to the game
+        """
+        for child in sage_node.children:
+            if isinstance(child, Leaf):
+                outcome = gambit_game.outcomes.add(child.name)
+                for player_index in range(len(self.players)):
+                    player = self.players[player_index]
+                    outcome[player_index] = int(child[player])
+                leaf_action_index = self._get_gambit_child_index(child)                                                           
+                gambit_node.children[leaf_action_index].outcome = outcome
 
 
 
