@@ -617,7 +617,7 @@ class Parser():
                     infoset_strategy = gambitstrategy[infoset_action_count: infoset_action_count + int(len(list(infoset.actions)))]
                     infoset_action_count += int(len(infoset.actions))
                     action_dict = {action.label:infoset_strategy[i] for i,action in enumerate(infoset.actions)}
-                    for node in list(infoset.members):
+                    for node in infoset.members:
                         player_dict[node.label] = action_dict
                 player_list = [player_dict]
                 nice_stuff.append(player_list)
