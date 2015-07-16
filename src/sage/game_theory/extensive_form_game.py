@@ -1233,10 +1233,11 @@ class ExtensiveFormGame():
 
         while len(current_info_sets)!= 0:
             current_info_sets.sort(key= lambda x:x[0].name)
+            self._gambit_convert_infoset_list = []
             for info_set in current_info_sets:
                 for node in info_set:
-                    action_getting_index = self._get_gambit_child_index(node) 
-                    gambit_node = parent_dict[node.parent].children[action_getting_index]
+                    child_index = self._get_gambit_child_index(node) 
+                    gambit_node = parent_dict[node.parent].children[child_index]
                     gambit_node.label = node.name
                     if node is info_set[0]:
                         move = self._set_gambit_move(node, info_set, gambit_node, gambit_game)                        
@@ -1244,13 +1245,9 @@ class ExtensiveFormGame():
                         gambit_node.append_move(move)
                     self._add_gambit_outcomes(node, gambit_node, gambit_game)
                     parent_dict[node] = gambit_node
+                self._setup_next_infosets(info_set, infoset_dictionary)
 
-            self._gambit_convert_infoset_list = []
-            for info_set in current_info_sets:
-                for key in infoset_dictionary.keys():
-                    if info_set == key:
-                        for listed_info_set in infoset_dictionary[key]:
-                            self._gambit_convert_infoset_list.append(listed_info_set)
+            
             current_info_sets = list(set(self._gambit_convert_infoset_list))
 
         return gambit_game
@@ -1416,6 +1413,50 @@ class ExtensiveFormGame():
                     outcome[player_index] = int(child[player])
                 leaf_action_index = self._get_gambit_child_index(child)                                                           
                 gambit_node.children[leaf_action_index].outcome = outcome
+
+    def _setup_next_infosets(self, info_set, infoset_dictionary):
+        """
+        The function sets up the next list of information sets to be looped through in the ``gambit_convert`` method.
+        
+        In order to use the function, we must mimic the stages of ``gambit_covert`` by first setting up an ``ExtensiveFormGame``::
+
+            sage: from gambit import Game  # optional - gambit
+            sage: player_1 = Player('Player 1')
+            sage: player_2 = Player('Player 2')
+            sage: leaf_1 = Leaf({player_1: 0, player_2: 1}, 'Leaf 1')
+            sage: leaf_2 = Leaf({player_1: 1, player_2: 0}, 'Leaf 2')
+            sage: leaf_3 = Leaf({player_1: 2, player_2: 4}, 'Leaf 3')
+            sage: leaf_4 = Leaf({player_1: 2, player_2: 1}, 'Leaf 4')
+            sage: node_1 = Node({'A': leaf_1, 'B': leaf_2}, 'Node 1', player_2)
+            sage: node_2 = Node({'A': leaf_3, 'B': leaf_4}, 'Node 2', player_2)
+            sage: root_1 = Node({'C': node_1, 'D': node_2}, 'Root 1', player_1)
+            sage: egame_1 = ExtensiveFormGame(root_1)
+
+        We then need a Gambit ``Game`` set up with players::
+
+            sage: g = Game.new_tree()  # optional - gambit
+            sage: g.players.add('Player 1')  # optional - gambit
+            <Player [0] 'Player 1' in game ''>
+            sage: g.players.add('Player 2')  # optional - gambit
+            <Player [1] 'Player 2' in game ''>
+
+        Then we can set up the branches we want within the game, which takes information from the sage node, 
+        and passes it to the gambit node::
+
+            sage: egame_1._set_gambit_move(root_1, root_1, g.root, g)  # optional - gambit
+            <Infoset [0] '(Extensive form game node with name: Root 1)' for player 'Player 1' in game ''>
+
+        Then we use the function and it'll append the next information sets to a list
+
+            sage: egame_1._setup_next_infosets(tuple([root_1]), egame_1._grow_infoset_graph_dictionary())
+            sage: egame_1._gambit_convert_infoset_list
+            [(Extensive form game node with name: Node 1,),
+            (Extensive form game node with name: Node 2,)]            
+        """
+        for key in infoset_dictionary.keys():
+            if info_set == key:
+                for listed_info_set in infoset_dictionary[key]:
+                    self._gambit_convert_infoset_list.append(listed_info_set)
 
 
 
