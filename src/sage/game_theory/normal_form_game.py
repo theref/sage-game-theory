@@ -605,6 +605,9 @@ from sage.matrix.constructor import vector
 from sage.misc.package import is_package_installed
 from sage.misc.temporary_file import tmp_filename
 from sage.numerical.mip import MixedIntegerLinearProgram
+from sage.graphs.bipartite_graph import BipartiteGraph
+from copy import copy
+import sys
 
 try:
     from gambit import Game
@@ -2596,6 +2599,933 @@ class NormalFormGame(SageObject, MutableMapping):
                 return True
         return False
 
+    def _lh_is_column_basic(self, dim1, dim2, tab, ntab, column):
+        r"""
+        Given a tableau, this function checks to see if a given column is basic.
+
+        INPUT:
+
+        - ``dim1`` -- Number of rows of the first tableau
+        - ``dim2`` -- Number of rows of the second tableau
+        - ``tab`` -- A list containing two tableaus
+        - ``ntab`` -- An integer (either 0 or 1) representing which of the tableaus being conisdered
+        - ``column`` -- An integer representing which of the columns in the tableau being considered
+
+        OUTPUT:
+
+        A boolean value stating whether or not the column is basic.
+
+        TESTS::
+
+            sage: A = matrix.identity(3)
+            sage: g = NormalFormGame([A, A])
+            sage: t = g._init_lh_tableau(A, A)
+            sage: g._lh_is_column_basic(3, 3, t[2], 0, 0)
+            False
+            sage: g._lh_is_column_basic(3, 3, t[2], 0, 1)
+            False
+            sage: g._lh_is_column_basic(3, 3, t[2], 0, 2)
+            True
+            sage: g._lh_is_column_basic(3, 3, t[2], 0, 5)
+            False
+        """
+        if ntab == 0:
+            nlines = dim1
+        else:
+            nlines = dim2
+
+        if column < 2 :
+            return False
+
+        for i in range(nlines):
+            val = int(tab[ntab][i,0])
+            if column == self._get_column(dim1, dim2, val) and ntab == self._get_tableau(dim1, dim2, val):
+                return True
+
+        return False
+
+    def _lh_lexicographic_min_ratio(self, dim1, dim2, tab, ntab, column):
+        r"""
+        Given a tableau and the column of the variable entering the basis, this method returns the
+        row of the leaving variable by calculating the lexicographic minimum ratio.
+
+        INPUT:
+
+        - ``dim1`` -- Number of rows of the first tableau
+        - ``dim2`` -- Number of rows of the second tableau
+        - ``tab`` -- A list containing two tableaus
+        - ``ntab`` -- An integer (either 0 or 1) representing which of the tableaus being conisdered
+        - ``column`` -- An integer representing the column of the entering variable
+
+        OUTPUT:
+
+        A non-negative integer showing the index of the leaving variable in the tableau, or -1 if an
+        error occurred.
+        """
+        if ntab == 0:
+            nlines = dim1
+        else:
+            nlines = dim2
+        #print tab[0]
+        #print "----"
+        #print tab[1]
+        #print "===="
+
+        numcand = 0
+        ncols = 2 + dim1 + dim2
+
+        leavecand = []
+
+        for i in range(nlines):
+            if tab[ntab][i,column] < -sys.float_info.epsilon :
+                leavecand.append(i)
+                numcand += 1
+
+        #print numcand, leavecand
+
+        if numcand == 0:
+            return -1
+
+        if numcand == 1:
+            return leavecand[0]
+
+        j = 1
+        while numcand > 1 :
+            t_col = j
+
+            if t_col == column:
+                continue
+
+            if self._lh_is_column_basic(dim1, dim2, tab, ntab, t_col) :
+                i = 0
+                while i < numcand :
+                    b = int(tab[ntab][leavecand[i],0])
+                    if self._get_column(dim1, dim2, b) == t_col :
+                        numcand -= 1
+                        leavecand[i] = leavecand[numcand]
+                        break
+                    i += 1
+            else:
+                newnum = 0
+                updated = False
+                i = 0
+                while i < numcand :
+                    if t_col == 1:
+                        val = -tab[ntab][leavecand[i],t_col]
+                    else :
+                        val = tab[ntab][leavecand[i],t_col]
+                    val /= tab[ntab][leavecand[i],column]
+
+                    if not updated or val < min - sys.float_info.epsilon :
+                        min = val
+                        updated = True
+                        newnum = 0
+                        leavecand[newnum] = leavecand[i]
+                    elif val >= min - sys.float_info.epsilon and val <= min + sys.float_info.epsilon:
+                        newnum += 1
+                        leavecand[newnum] = leavecand[i]
+                    i += 1
+                numcand = newnum + 1
+
+            j += 1
+
+        if not updated :
+            return -1
+        #print "Leave", leavecand[0]
+
+        return leavecand[0]
+
+    def _init_lh_tableau(self, A, B):
+        r"""
+        Creates the set of tableaus representing the best response polytopes for the two players
+        given their payoff matrices.
+
+        INPUT:
+
+        - ``A`` -- The payoff matrix for the row player
+        - ``B`` -- The payoff matrix for the column player
+
+        OUTPUT:
+
+        Returns a 3-tuple
+
+        1. Number of rows in the first tableau
+        2. Number of rows in the second tableau
+        3. A list containing the two tableaus
+
+        TESTS:
+            
+            sage: g = NormalFormGame([matrix(3)])
+            sage: tab = g._init_lh_tableau(matrix.identity(3), matrix.identity(3))
+            sage: tab[0]
+            3
+            sage: tab[1]
+            3
+            sage: print tab[2][0].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [-1.00  1.00 0.000 0.000 0.000 -2.00 -1.00 -1.00]
+            [-2.00  1.00 0.000 0.000 0.000 -1.00 -2.00 -1.00]
+            [-3.00  1.00 0.000 0.000 0.000 -1.00 -1.00 -2.00]
+            sage: print tab[2][1].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [-4.00  1.00 0.000 0.000 0.000 -2.00 -1.00 -1.00]
+            [-5.00  1.00 0.000 0.000 0.000 -1.00 -2.00 -1.00]
+            [-6.00  1.00 0.000 0.000 0.000 -1.00 -1.00 -2.00]
+            sage: A = matrix([[160, 205, 44],
+            ....:       [175, 180, 45],
+            ....:       [201, 204, 50],
+            ....:       [120, 207, 49]])
+            sage: B = matrix([[2, 2, 2],
+            ....:             [1, 0, 0],
+            ....:             [3, 4, 1],
+            ....:             [4, 1, 2]])
+            sage: tab = g._init_lh_tableau(A, B)
+            sage: tab[0]
+            4
+            sage: tab[1]
+            3
+            sage: print tab[2][0].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [-1.00  1.00 0.000 0.000 0.000 0.000 -112. -157.  4.00]
+            [-2.00  1.00 0.000 0.000 0.000 0.000 -127. -132.  3.00]
+            [-3.00  1.00 0.000 0.000 0.000 0.000 -153. -156. -2.00]
+            [-4.00  1.00 0.000 0.000 0.000 0.000 -72.0 -159. -1.00]
+            sage: print tab[2][1].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [-5.00  1.00 0.000 0.000 0.000 0.000 -2.00 -4.00 -5.00]
+            [-6.00  1.00 0.000 0.000 0.000 0.000 -1.00 -5.00 -2.00]
+            [-7.00  1.00 0.000 0.000 0.000 0.000 -1.00 -2.00 -3.00]
+        """
+        A = self._positivize_matrix(A)
+        B = self._positivize_matrix(B.T)
+        tab = self._init_tableau(A, B)
+        return tab
+
+    def _positivize_matrix(self, A):
+        r"""
+        This method returns a copy of the original matrix where all its are strictly positive by
+        adding a constant to all the entries of the matrix.
+
+        EXAMPLES::
+
+            sage: A = matrix.identity(3)
+            sage: g = NormalFormGame([A, A])
+            sage: B = g._positivize_matrix(A)
+            sage: B
+            [2 1 1]
+            [1 2 1]
+            [1 1 2]
+            sage: g._positivize_matrix(B)
+            [2 1 1]
+            [1 2 1]
+            [1 1 2]
+            sage: g._positivize_matrix(A * -1)
+            [1 2 2]
+            [2 1 2]
+            [2 2 1]
+        """
+        m = min(min(A))
+        #R = matrix(A, copy=True)
+        R = copy(A)
+        for i in range(A.nrows()):
+            for j in range(A.ncols()):
+                R[i,j] -= (m - 1.0)
+        return R
+        
+    def _init_tableau(self, A, B):
+        r"""
+        Creates the set of tableaus representing the best response polytopes for the two players
+        given their payoff matrices.
+
+        .. NOTE::
+        
+            This function shouldn't be used directly with payoff matrices where all elements are
+            not greater than zero.
+
+        .. SEEALSO::
+            
+            :func:`_init_lh_tableau`
+
+        INPUT:
+
+        - ``A`` -- The payoff matrix for the row player
+        - ``B`` -- The payoff matrix for the column player
+
+        OUTPUT:
+
+        Returns a 3-tuple
+
+        1. Number of rows in the first tableau
+        2. Number of rows in the second tableau
+        3. A list containing the two tableaus
+
+        TESTS:
+            
+            sage: g = NormalFormGame([matrix(3)])
+            sage: tab = g._init_lh_tableau(matrix.identity(3), matrix.identity(3))
+            sage: tab[0]
+            3
+            sage: tab[1]
+            3
+            sage: print tab[2][0].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [-1.00  1.00 0.000 0.000 0.000 -2.00 -1.00 -1.00]
+            [-2.00  1.00 0.000 0.000 0.000 -1.00 -2.00 -1.00]
+            [-3.00  1.00 0.000 0.000 0.000 -1.00 -1.00 -2.00]
+            sage: print tab[2][1].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [-4.00  1.00 0.000 0.000 0.000 -2.00 -1.00 -1.00]
+            [-5.00  1.00 0.000 0.000 0.000 -1.00 -2.00 -1.00]
+            [-6.00  1.00 0.000 0.000 0.000 -1.00 -1.00 -2.00]
+            sage: A = matrix([[160, 205, 44],
+            ....:       [175, 180, 45],
+            ....:       [201, 204, 50],
+            ....:       [120, 207, 49]])
+            sage: B = matrix([[2, 2, 2],
+            ....:             [1, 0, 0],
+            ....:             [3, 4, 1],
+            ....:             [4, 1, 2]])
+            sage: tab = g._init_lh_tableau(A, B)
+            sage: tab[0]
+            4
+            sage: tab[1]
+            3
+            sage: print tab[2][0].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [-1.00  1.00 0.000 0.000 0.000 0.000 -112. -157.  4.00]
+            [-2.00  1.00 0.000 0.000 0.000 0.000 -127. -132.  3.00]
+            [-3.00  1.00 0.000 0.000 0.000 0.000 -153. -156. -2.00]
+            [-4.00  1.00 0.000 0.000 0.000 0.000 -72.0 -159. -1.00]
+            sage: print tab[2][1].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [-5.00  1.00 0.000 0.000 0.000 0.000 -2.00 -4.00 -5.00]
+            [-6.00  1.00 0.000 0.000 0.000 0.000 -1.00 -5.00 -2.00]
+            [-7.00  1.00 0.000 0.000 0.000 0.000 -1.00 -2.00 -3.00]
+        """
+        from sage.rings.all import RR
+        m = A.nrows()
+        n = A.ncols()
+        tab1 = matrix(RR, m, 2+m+n)
+        tab2 = matrix(RR, n, 2+m+n)
+        
+        for i in range(m):
+            tab1[i,0] = - i - 1
+            tab1[i,1] = 1
+        
+        for i in range(n):
+            tab2[i,0] = - i - m - 1
+            tab2[i,1] = 1
+        
+        for i in range(m):
+            for j in range(2 + m, 2 + m + n):
+                tab1[i,j] = -A[i,j - 2 - m]
+        
+        for i in range(n):
+            for j in range(2 + m, 2 + m + n):
+                tab2[i,j] = -B[i,j - 2 - n]
+        
+        tab = (tab1, tab2)
+        return (m, n, tab)
+        
+    def _get_tableau(self, dim1, dim2, strategy):
+        r"""
+        Given a strategy index, returns which tableau it belongs to and returns -1 if it belongs to
+        neither.
+        
+        TESTS:
+
+            sage: g = NormalFormGame([matrix(3)])
+            sage: g._get_tableau(3, 3, 1)
+            1
+            sage: g._get_tableau(3, 3, 3)
+            1
+            sage: g._get_tableau(3, 3, -4)
+            1
+            sage: g._get_tableau(3, 3, -6)
+            1
+            sage: g._get_tableau(3, 3, 4)
+            0
+            sage: g._get_tableau(3, 3, 6)
+            0
+            sage: g._get_tableau(3, 3, -1)
+            0
+            sage: g._get_tableau(3, 3, -3)
+            0
+            sage: g._get_tableau(3, 3, 0)
+            -1
+        """
+        if strategy > dim1 or (strategy < 0 and strategy >= -dim1) :
+            return 0
+        if strategy < -dim1 or (strategy > 0 and strategy <= dim1) :
+            return 1
+        return -1
+        
+    def _get_column(self, dim1, dim2, strategy):
+        r"""
+        Given a strategy, returns the column which corresponds to the given strategy. A negative
+        index is returned if the strategy does not exist. 
+
+        .. NOTE::
+            For the implementation of Lemke-Howson, the individual strategies are indexed from 1 to
+            ``dim1`` for the row player and ``dim1 + 1`` to ``dim2`` for the column player.
+
+        .. NOTE::
+            ``strategy`` takes an input within the range from ``- dim1 - dim2`` to ``dim1 + dim2``
+            excluding 0, where the positive values indicate the strategies of the players, and the
+            negative values indicate the slack variables in the tableau.
+
+        TESTS:
+            sage: g = NormalFormGame([matrix(4)])
+            sage: g._get_column(4, 4, 0) < 0
+            True
+            sage: g._get_column(4, 4, 10) < 0
+            True
+            sage: g._get_column(4, 4, -10) < 0
+            True
+            sage: g._get_column(4, 4, -1)
+            2
+            sage: g._get_column(4, 4, -5)
+            2
+            sage: g._get_column(4, 4, -4)
+            5
+            sage: g._get_column(4, 4, 1)
+            6
+            sage: g._get_column(4, 4, 5)
+            6
+        """
+        if abs(strategy) > dim1 + dim2 :
+            return -1
+        if strategy > 0 and strategy <= dim1 :
+            return (1 + dim2 + strategy )
+        if strategy > 0 and strategy > dim1 :
+            return (1 + dim1 + strategy - dim1)
+        if strategy < 0 and strategy >= -dim1 :
+            return (1 - strategy )
+
+        return ( 1 - strategy - dim1 )
+
+    def _get_pivot_gen(self, dim1, dim2, tab, strategy):
+        r"""
+        Checks if a strategy is in the base of the current tableaus. If it is then it returns the
+        corresponding slack variable otherwise returns the strategy.
+
+        TESTS:
+
+            sage: A = matrix([[-1, 1, 0, 0, 0, 1],
+            ....:             [ 3, 1, 0, 1, 0, 2]])
+            sage: B = matrix([[ 2, 2, 3, 0, 0, 1],
+            ....:             [-4, 1, 1, 0, 0, 2]])
+            sage: g = NormalFormGame([matrix(2)])
+            sage: g._get_pivot_gen(2, 2, [A, B], 1)
+            1
+            sage: g._get_pivot_gen(2, 2, [A, B], 2)
+            -2
+            sage: g._get_pivot_gen(2, 2, [A, B], 3)
+            -3
+            sage: g._get_pivot_gen(2, 2, [A, B], 4)
+            4
+        """
+        for i in range(dim1):
+            if tab[0][i,0] == strategy :
+                return -strategy
+        
+        for i in range(dim2):
+            if tab[1][i,0] == strategy :
+                return -strategy
+        
+        return strategy
+
+    def _lh_solve_tableau(self, tableaus, startpivot):
+        r"""
+        Runs the Lemke-Howson algorithm with the given tableaus starting with the given missing
+        label (or entering variable).
+
+        INPUT:
+        
+        - ``tableaus`` -- The tableaus representing the best response polytopes for the players in
+          the game.
+        - ``startpivot`` -- The initial missing label (entering variable)
+
+        TESTS:
+
+            sage: A = matrix.identity(3)
+            sage: g = NormalFormGame([A, A])
+            sage: tab = g._init_lh_tableau(A, A)
+            sage: res = g._lh_solve_tableau(tab[2], 1)
+            sage: print res[0][0].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [  4.00  0.500 -0.500  0.000  0.000  0.000 -0.500 -0.500]
+            [ -2.00  0.500  0.500  0.000  0.000  0.000  -1.50 -0.500]
+            [ -3.00  0.500  0.500  0.000  0.000  0.000 -0.500  -1.50]
+            sage: print res[0][1].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [  1.00  0.500 -0.500  0.000  0.000  0.000 -0.500 -0.500]
+            [ -5.00  0.500  0.500  0.000  0.000  0.000  -1.50 -0.500]
+            [ -6.00  0.500  0.500  0.000  0.000  0.000 -0.500  -1.50]
+            sage: [[[round(el, 6) for el in v] for v in eq] for eq in [res[1]]] 
+            [[[1.0, 0.0, 0.0], [1.0, 0.0, 0.0]]]
+            sage: res = g._lh_solve_tableau(tab[2], 5)
+            sage: print res[0][0].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [ -1.00  0.500  0.000  0.500  0.000  -1.50  0.000 -0.500]
+            [  5.00  0.500  0.000 -0.500  0.000 -0.500  0.000 -0.500]
+            [ -3.00  0.500  0.000  0.500  0.000 -0.500  0.000  -1.50]
+            sage: print res[0][1].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [ -4.00  0.500  0.000  0.500  0.000  -1.50  0.000 -0.500]
+            [  2.00  0.500  0.000 -0.500  0.000 -0.500  0.000 -0.500]
+            [ -6.00  0.500  0.000  0.500  0.000 -0.500  0.000  -1.50]
+            sage: [[[round(el, 6) for el in v] for v in eq] for eq in [res[1]]] 
+            [[[0.0, 1.0, 0.0], [0.0, 1.0, 0.0]]]
+            sage: tab = g._init_lh_tableau(matrix(3), matrix(3))
+            sage: res = g._lh_solve_tableau(tab[2], 1)
+            sage: print res[0][0].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [-1.00 0.000 0.000 0.000  1.00 0.000 0.000 0.000]
+            [-2.00 0.000 0.000 0.000  1.00 0.000 0.000 0.000]
+            [ 6.00  1.00 0.000 0.000 -1.00 -1.00 -1.00 0.000]
+            sage: print res[0][1].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [-4.00 0.000 0.000 0.000  1.00 0.000 0.000 0.000]
+            [-5.00 0.000 0.000 0.000  1.00 0.000 0.000 0.000]
+            [ 3.00  1.00 0.000 0.000 -1.00 -1.00 -1.00 0.000]
+            sage: [[[round(el, 6) for el in v] for v in eq] for eq in [res[1]]] 
+            [[[0.0, 0.0, 1.0], [0.0, 0.0, 1.0]]]
+            sage: res = g._lh_solve_tableau(tab[2], 2)
+            sage: print res[0][0].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [-1.00 0.000 0.000 0.000  1.00 0.000 0.000 0.000]
+            [-2.00 0.000 0.000 0.000  1.00 0.000 0.000 0.000]
+            [ 6.00  1.00 0.000 0.000 -1.00 -1.00 -1.00 0.000]
+            sage: print res[0][1].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [-4.00 0.000 0.000 0.000  1.00 0.000 0.000 0.000]
+            [-5.00 0.000 0.000 0.000  1.00 0.000 0.000 0.000]
+            [ 3.00  1.00 0.000 0.000 -1.00 -1.00 -1.00 0.000]
+            sage: [[[round(el, 6) for el in v] for v in eq] for eq in [res[1]]] 
+            [[[0.0, 0.0, 1.0], [0.0, 0.0, 1.0]]]
+            sage: res = g._lh_solve_tableau(tab[2], 4)
+            sage: print res[0][0].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [-1.00 0.000 0.000 0.000  1.00 0.000 0.000 0.000]
+            [-2.00 0.000 0.000 0.000  1.00 0.000 0.000 0.000]
+            [ 6.00  1.00 0.000 0.000 -1.00 -1.00 -1.00 0.000]
+            sage: print res[0][1].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [-4.00 0.000 0.000 0.000  1.00 0.000 0.000 0.000]
+            [-5.00 0.000 0.000 0.000  1.00 0.000 0.000 0.000]
+            [ 3.00  1.00 0.000 0.000 -1.00 -1.00 -1.00 0.000]
+            sage: [[[round(el, 6) for el in v] for v in eq] for eq in [res[1]]] 
+            [[[0.0, 0.0, 1.0], [0.0, 0.0, 1.0]]]
+            sage: res = g._lh_solve_tableau(tab[2], 5)
+            sage: print res[0][0].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [-1.00 0.000 0.000 0.000  1.00 0.000 0.000 0.000]
+            [-2.00 0.000 0.000 0.000  1.00 0.000 0.000 0.000]
+            [ 6.00  1.00 0.000 0.000 -1.00 -1.00 -1.00 0.000]
+            sage: print res[0][1].str(rep_mapping=lambda x: str(x.n(digits=3)))
+            [-4.00 0.000 0.000 0.000  1.00 0.000 0.000 0.000]
+            [-5.00 0.000 0.000 0.000  1.00 0.000 0.000 0.000]
+            [ 3.00  1.00 0.000 0.000 -1.00 -1.00 -1.00 0.000]
+            sage: [[[round(el, 6) for el in v] for v in eq] for eq in [res[1]]] 
+            [[[0.0, 0.0, 1.0], [0.0, 0.0, 1.0]]]
+        """
+        #tab = [matrix(tableaus[0], copy=True), matrix(tableaus[1], copy=True)]
+        tab = [copy(tableaus[0]), copy(tableaus[1])]
+        dim1 = tab[0].nrows()
+        dim2 = tab[1].nrows()
+        index = 0
+        pivot = self._get_pivot_gen(dim1, dim2, tab, startpivot)
+        
+        while True:
+            min_ratio = 0.0
+            updated = False
+            
+            ntab = self._get_tableau(dim1, dim2, pivot)
+            nlines = dim1 if (ntab == 0) else dim2
+            column = self._get_column(dim1, dim2, pivot)
+            
+            # Standard min-ratio
+            #for i in range(nlines):
+            #    if tab[ntab][i,column] > -sys.float_info.epsilon : #check for eps
+            #        continue
+            #    val = -tab[ntab][i,1] / tab[ntab][i,column]
+            #    
+            #    if not updated or val < min_ratio - sys.float_info.epsilon :
+            #        min_ratio = val
+            #        updated = True
+            #        index = i
+            index = self._lh_lexicographic_min_ratio(dim1, dim2, tab, ntab, column)
+
+            #print "=========="
+            #print tab[0]
+            #print "----------"
+            #print tab[1]
+            #print "=========="
+            
+            #if not updated :
+            if index < 0 :
+                raise Exception("floating point error most likely occured")
+            
+            newpivot = int(tab[ntab][index,0])
+            #print ntab, index, newpivot
+            
+            tab[ntab][index,self._get_column(dim1, dim2, newpivot)] = -1
+            tab[ntab][index,0] = pivot
+            coeff = -tab[ntab][index,column]
+            
+            for i in range(1, 2 + dim1 + dim2):
+                tab[ntab][index,i] /= coeff
+            tab[ntab][index,column] = 0
+            
+            for i in range(nlines):
+                if tab[ntab][i][column] < -sys.float_info.epsilon or tab[ntab][i][column] > sys.float_info.epsilon :
+                #if tab[ntab][i,column] != 0 :
+                    for j in range(1, 2 + dim1 + dim2) :
+                        agg = tab[ntab][i,column] * tab[ntab][index,j]
+                        tab[ntab][i,j] += agg
+                    
+                    tab[ntab][i,column] = 0
+                    
+            pivot = -newpivot
+            if newpivot == startpivot or newpivot == -startpivot :
+                break
+        
+        #print "=========="
+        #print "After LH"
+        #print tab[0]
+        #print "----------"
+        #print tab[1]
+        #print "=========="
+            
+        tot1 = 0
+        tot2 = 0
+        
+        for i in range(dim1):
+            if tab[0][i,0] > sys.float_info.epsilon:
+                tot1 += tab[0][i,1]
+                
+        for i in range(dim2):
+            if tab[1][i,0] > sys.float_info.epsilon:
+                tot2 += tab[1][i,1]
+               
+        y = [0.0] * int(dim2)
+        for i in range(dim1):
+            if tab[0][i,0] > sys.float_info.epsilon:
+                y[int(tab[0][i,0] - dim1 - 1)] = (tab[0][i,1]/tot1)
+               
+        x = [0.0] * int(dim1)
+        for i in range(dim2):
+            if tab[1][i,0] > sys.float_info.epsilon:
+                x[int(tab[1][i,0] - 1)] = (tab[1][i,1]/tot2)
+
+        return (tab, [x, y])
+
+    def _solve_lh(self, missing = 1):
+        r"""
+        Solve the current game by running the Lemke-Howson algorithm from the artificial algorithm
+        with a given missing label.
+
+        EXAMPLES::
+
+        A simple game::
+
+            sage: A = matrix.identity(3)
+            sage: g = NormalFormGame([A, A])
+            sage: g._solve_lh()
+            [[[1.00000000000000, 0.0, 0.0], [1.00000000000000, 0.0, 0.0]]]
+            sage: g._solve_lh(2)
+            [[[0.0, 1.00000000000000, 0.0], [0.0, 1.00000000000000, 0.0]]]
+            sage: g._solve_lh(4)
+            [[[1.00000000000000, 0.0, 0.0], [1.00000000000000, 0.0, 0.0]]]
+
+        2 random matrices::
+            sage: p1 = matrix([[-1, 4, 0, 2, 0],
+            ....:              [-17, 246, -5, 1, -2],
+            ....:              [0, 1, 1, -4, -4],
+            ....:              [1, -3, 9, 6, -1],
+            ....:              [2, 53, 0, -5, 0]])
+            sage: p2 = matrix([[0, 1, 1, 3, 1],
+            ....:              [3, 9, 44, -1, -1],
+            ....:              [1, -4, -1, -3, 1],
+            ....:              [1, 0, 0, 0, 0,],
+            ....:              [1, -3, 1, 21, -2]])
+            sage: biggame = NormalFormGame([p1, p2])
+            sage: ne = biggame._solve_lh()
+            sage: [[[round(el, 6) for el in v] for v in eq] for eq in ne] 
+            [[[0.0, 0.0, 0.0, 0.952381, 0.047619], [0.916667, 0.0, 0.0, 0.083333, 0.0]]]
+        """
+        A, B = self.payoff_matrices()
+        tab = self._init_lh_tableau(A, B)
+        return [self._lh_solve_tableau(tab[2], missing)[1]]
+
+    def _lh_find_all_from(self, i, isneg, neg, pos):
+        r"""
+        Computes all equilibria which can be found by starting from the current equilibrium using
+        all pure strategies as the starting missing label. Upon computation of an equiibrium, it
+        adds it to the corresponding list depending on whether it was a positive or a negatively
+        indexed equilibrium.
+
+        INPUT:
+
+        - ``i`` -- An integer indicating the location of the equilibrium being looked at
+        - ``isneg`` -- Indicates whether the starting equilibrium is ``neg[i]`` if ``isneg`` is True
+          and ``pos[i]`` otherwise.
+        - ``neg`` -- A list of equilibria which have negative index.
+        - ``pos`` -- A list of equilibria which have positive index.
+
+        TESTS:
+
+            sage: from sage.game_theory.normal_form_game import _LHEquilibrium
+            sage: A = B = matrix.identity(3)
+            sage: g = NormalFormGame([A, B])
+            sage: tab = g._init_lh_tableau(A, B)
+            sage: neg = [_LHEquilibrium(tab[2], [[0]*tab[0], [0]*tab[1]])]
+            sage: pos = []
+            sage: g._lh_find_all_from(0, True, neg, pos)
+            sage: pos
+            [Equ [[1.00000000000000, 0.0, 0.0], [1.00000000000000, 0.0, 0.0]] Labels[0, -1, -1, 0, -1, -1],
+             Equ [[0.0, 1.00000000000000, 0.0], [0.0, 1.00000000000000, 0.0]] Labels[-1, 0, -1, -1, 0, -1],
+             Equ [[0.0, 0.0, 1.00000000000000], [0.0, 0.0, 1.00000000000000]] Labels[-1, -1, 0, -1, -1, 0]]
+            sage: g._lh_find_all_from(0, True, neg, pos)
+            sage: pos
+            [Equ [[1.00000000000000, 0.0, 0.0], [1.00000000000000, 0.0, 0.0]] Labels[0, -1, -1, 0, -1, -1],
+             Equ [[0.0, 1.00000000000000, 0.0], [0.0, 1.00000000000000, 0.0]] Labels[-1, 0, -1, -1, 0, -1],
+             Equ [[0.0, 0.0, 1.00000000000000], [0.0, 0.0, 1.00000000000000]] Labels[-1, -1, 0, -1, -1, 0]]
+        """
+        if isneg:
+            cur = neg[i]
+            eq_list = pos
+        else:
+            cur = pos[i]
+            eq_list = neg
+
+        #print cur.tab
+        #print "Starting ", i, " isneg ", isneg
+
+        for k in range(len(cur.labels)):
+            if cur.labels[k] != -1:
+                continue
+            #print k
+            tab, eq = self._lh_solve_tableau(cur.tab, k + 1)
+            #print eq
+
+            e = _LHEquilibrium(tab, eq)
+            if e not in eq_list:
+                eq_list.append(e)
+            idx = eq_list.index(e)
+            cur.labels[k] = idx
+            eq_list[idx].labels[k] = i
+
+    def _lh_find_all(self):
+        r"""
+        This method computes and returns all equilibria which are reachable by the Lemke-Howson
+        algorithm by starting from the artificial equilibrium.
+
+        OUTPUT:
+
+        A 2-tuple of lists
+
+        1. A list of all negatively indexed Nash equilibria (this includes the artificial
+        equilibrium)
+        2. A list of all positively indexed Nash equilibria
+
+        EXAMPLES::
+
+        A game with a single Nash equilibrium::
+            
+            sage: A = matrix.identity(3)
+            sage: g = NormalFormGame([A])
+            sage: g._lh_find_all()
+            ([Equ [[0, 0, 0], [0, 0, 0]] Labels[0, 0, 0, 0, 0, 0]],
+             [Equ [[0.333333333333333, 0.333333333333333, 0.333333333333333], [0.333333333333333, 0.333333333333333, 0.333333333333333]] Labels[0, 0, 0, 0, 0, 0]])
+
+        A game with multiple Nash equilibria::
+
+            sage: A = matrix.identity(3)
+            sage: g = NormalFormGame([A, A])
+            sage: g._lh_find_all()
+            ([Equ [[0, 0, 0], [0, 0, 0]] Labels[0, 1, 2, 0, 1, 2],
+              Equ [[0.500000000000000, 0.500000000000000, 0.0], [0.500000000000000, 0.500000000000000, 0.0]] Labels[1, 0, 3, 1, 0, 3],
+              Equ [[0.500000000000000, 0.0, 0.500000000000000], [0.500000000000000, 0.0, 0.500000000000000]] Labels[2, 3, 0, 2, 3, 0],
+              Equ [[0.0, 0.500000000000000, 0.500000000000000], [0.0, 0.500000000000000, 0.500000000000000]] Labels[3, 2, 1, 3, 2, 1]],
+             [Equ [[1.00000000000000, 0.0, 0.0], [1.00000000000000, 0.0, 0.0]] Labels[0, 1, 2, 0, 1, 2],
+              Equ [[0.0, 1.00000000000000, 0.0], [0.0, 1.00000000000000, 0.0]] Labels[1, 0, 3, 1, 0, 3],
+              Equ [[0.0, 0.0, 1.00000000000000], [0.0, 0.0, 1.00000000000000]] Labels[2, 3, 0, 2, 3, 0],
+              Equ [[0.333333333333333, 0.333333333333333, 0.333333333333333], [0.333333333333333, 0.333333333333333, 0.333333333333333]] Labels[3, 2, 1, 3, 2, 1]])
+
+        This algorithm might not be able to find all the Nash equilibria within a game most
+        especially when the game is degenerate::
+
+            sage: A = matrix(3)
+            sage: g = NormalFormGame([A, A])
+            sage: g.obtain_nash('enumeration')
+            [[(0, 0, 1), (0, 0, 1)],
+             [(0, 0, 1), (0, 1, 0)],
+             [(0, 0, 1), (1, 0, 0)],
+             [(0, 1, 0), (0, 0, 1)],
+             [(0, 1, 0), (0, 1, 0)],
+             [(0, 1, 0), (1, 0, 0)],
+             [(1, 0, 0), (0, 0, 1)],
+             [(1, 0, 0), (0, 1, 0)],
+             [(1, 0, 0), (1, 0, 0)]]
+            sage: g._lh_find_all()
+            ([Equ [[0, 0, 0], [0, 0, 0]] Labels[0, 0, 0, 0, 0, 0]],
+             [Equ [[0.0, 0.0, 1.00000000000000], [0.0, 0.0, 1.00000000000000]] Labels[0, 0, 0, 0, 0, 0]])
+        """
+        neg = []
+        pos = []
+
+        A, B = self.payoff_matrices()
+        tab = self._init_lh_tableau(A, B)
+        neg.append(_LHEquilibrium(tab[2], [[0]*tab[0], [0]*tab[1]]))
+        #print "Load", neg[0].tab[0]
+        #print "Load", neg[0].tab[1]
+
+        tab, eq = self._lh_solve_tableau(neg[0].tab, 1)
+        pos.append(_LHEquilibrium(tab, eq))
+
+        #print "Load", neg[0].tab[0]
+        #print "Load", neg[0].tab[1]
+
+        neg[0].labels[0] = 0
+        pos[0].labels[0] = 0
+
+        negi = 1
+        posi = 0
+
+        self._lh_find_all_from(0, True, neg, pos)
+
+        isneg = False
+        while True:
+            if isneg:
+                while negi < len(neg):
+                    self._lh_find_all_from(negi, isneg, neg, pos)
+                    negi += 1
+            else:
+                while posi < len(pos):
+                    self._lh_find_all_from(posi, isneg, neg, pos)
+                    posi += 1
+
+            isneg = not isneg
+            if negi == len(neg) and posi == len(pos):
+                break
+
+        return (neg, pos)
+
+    def _lh_bipartite_graph(self):
+        r"""
+        This method computes and returns all equilibria which are reachable by the Lemke-Howson
+        algorithm by starting from the artificial equilibrium, as well as a bipartite graph showing
+        how these equilibria are connected.
+
+        OUTPUT:
+
+        A 3-tuple
+
+        1. A bipartite graph
+        2. A list of all negatively indexed Nash equilibria (this includes the artificial
+        equilibrium)
+        3. A list of all positively indexed Nash equilibria
+
+        EXAMPLES::
+
+        A game with a single equilibrium::
+
+            sage: A = matrix.identity(3)
+            sage: g = NormalFormGame([A])
+            sage: sol = g._lh_bipartite_graph()
+            sage: sol
+            (Bipartite graph on 2 vertices,
+             [Equ [[0, 0, 0], [0, 0, 0]] Labels[0, 0, 0, 0, 0, 0]],
+             [Equ [[0.333333333333333, 0.333333333333333, 0.333333333333333], [0.333333333333333, 0.333333333333333, 0.333333333333333]] Labels[0, 0, 0, 0, 0, 0]])
+
+        A game with multiple equilibria::
+
+            sage: A = matrix.identity(3)
+            sage: g = NormalFormGame([A, A])
+            sage: sol = g._lh_bipartite_graph()
+            sage: sol
+            (Bipartite graph on 8 vertices,
+             [Equ [[0, 0, 0], [0, 0, 0]] Labels[0, 1, 2, 0, 1, 2],
+              Equ [[0.500000000000000, 0.500000000000000, 0.0], [0.500000000000000, 0.500000000000000, 0.0]] Labels[1, 0, 3, 1, 0, 3],
+              Equ [[0.500000000000000, 0.0, 0.500000000000000], [0.500000000000000, 0.0, 0.500000000000000]] Labels[2, 3, 0, 2, 3, 0],
+              Equ [[0.0, 0.500000000000000, 0.500000000000000], [0.0, 0.500000000000000, 0.500000000000000]] Labels[3, 2, 1, 3, 2, 1]],
+             [Equ [[1.00000000000000, 0.0, 0.0], [1.00000000000000, 0.0, 0.0]] Labels[0, 1, 2, 0, 1, 2],
+              Equ [[0.0, 1.00000000000000, 0.0], [0.0, 1.00000000000000, 0.0]] Labels[1, 0, 3, 1, 0, 3],
+              Equ [[0.0, 0.0, 1.00000000000000], [0.0, 0.0, 1.00000000000000]] Labels[2, 3, 0, 2, 3, 0],
+              Equ [[0.333333333333333, 0.333333333333333, 0.333333333333333], [0.333333333333333, 0.333333333333333, 0.333333333333333]] Labels[3, 2, 1, 3, 2, 1]])
+        """
+        neg, pos = self._lh_find_all()
+        #G = {}
+        #for i in range(len(neg)):
+        #    G[str(-i)] = neg[i].labels
+        #return G
+        B = BipartiteGraph()
+        for i in range(len(neg)):
+            for j in set(neg[i].labels):
+                indices = ",".join([str(k + 1) for k, x in enumerate(neg[i].labels) if x == j])
+                B.add_edge("-"+str(i), j, indices)
+                #print i, "->",  indices
+        return (B, neg, pos)
+
+class _LHEquilibrium():
+    def __init__(self, tab, eq):
+        r"""
+        TESTS::
+            
+            sage: from sage.game_theory.normal_form_game import _LHEquilibrium
+            sage: A = matrix.identity(3)
+            sage: e = _LHEquilibrium([A, A], [[0]*3, [0]*3])
+            sage: e.eq
+            [[0, 0, 0], [0, 0, 0]]
+            sage: e.labels
+            [-1, -1, -1, -1, -1, -1]
+        """
+        self.tab = tab
+        self.eq = eq
+        self.labels = [-1] * (tab[0].nrows() + tab[1].nrows())
+
+    def __eq__(self, other):
+        r"""
+        TESTS::
+
+            sage: from sage.game_theory.normal_form_game import _LHEquilibrium
+            sage: A = matrix.identity(3)
+            sage: e1 = _LHEquilibrium([A, A], [[0]*3, [0]*3])
+            sage: e2 = _LHEquilibrium([A, A], [[0]*3, [0]*3])
+            sage: e3 = _LHEquilibrium([A, -A], [[1, 0, 0], [1, 0, 0]])
+            sage: e1 == e2
+            True
+            sage: e2 == e3
+            False
+        """
+        if self.tab[0].nrows() != other.tab[0].nrows():
+            return False
+        if self.tab[0].ncols() != other.tab[0].ncols():
+            return False
+        if self.tab[1].nrows() != other.tab[1].nrows():
+            return False
+        if self.tab[1].ncols() != other.tab[1].ncols():
+            return False
+
+        basis_1 = set()
+        basis_2 = set()
+        for i in range(self.tab[0].nrows()):
+            basis_1.add(self.tab[0][i,0])
+            basis_2.add(other.tab[0][i,0])
+
+        if basis_1 != basis_2:
+            return False
+
+        basis_1 = set()
+        basis_2 = set()
+        for i in range(self.tab[1].nrows()):
+            basis_1.add(self.tab[1][i,0])
+            basis_2.add(other.tab[1][i,0])
+
+        if basis_1 != basis_2:
+            return False
+
+        #for i in range(len(self.eq[0])):
+        #    diff = abs(self.eq[0][i] - other.eq[0][i])
+        #    if diff > sys.float_info.epsilon :
+        #        return False
+        #for i in range(len(self.eq[1])):
+        #    diff = abs(self.eq[1][i] - other.eq[1][i])
+        #    if diff > sys.float_info.epsilon :
+        #        return False
+
+        return True
+
+    def __str__(self):
+        s = "Equ " + str(self.eq)
+        s += " Labels" + str(self.labels)
+        return s
+
+    def __repr__(self):
+        return str(self)
 
 class _Player():
     def __init__(self, num_strategies):
