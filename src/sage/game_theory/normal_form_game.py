@@ -2913,7 +2913,7 @@ class NormalFormGame(SageObject, MutableMapping):
                 tab1[i,j] = -A[i,j - 2 - m]
         
         for i in range(n):
-            for j in range(2 + m, 2 + m + n):
+            for j in range(2 + n, 2 + m + n):
                 tab2[i,j] = -B[i,j - 2 - n]
         
         tab = (tab1, tab2)
