@@ -2691,6 +2691,52 @@ class ExtensiveFormGame():
         nasheq = Parser(lcp_output).format_gambit_efg_tree(gambit_efg)
         return nasheq
 
+    def _grow_player_tree_dictionary(self):
+        """
+        Grows a tree showing just the actions and nodes of each player individually::
+        sage: player_1 = EFG_Player('Player 1')
+        sage: player_2 = EFG_Player('Player 2')
+        sage: leaf_1 = EFG_Leaf({player_1 : 0, player_2: 1}, 'Leaf 1')
+        sage: leaf_2 = EFG_Leaf({player_1 : 1, player_2: 0}, 'Leaf 2')
+        sage: leaf_3 = EFG_Leaf({player_1 : 2, player_2: 4}, 'Leaf 3')
+        sage: leaf_4 = EFG_Leaf({player_1 : 2, player_2: 1}, 'Leaf 4')
+        sage: leaf_5 = EFG_Leaf({player_1 : 0, player_2: 1}, 'Leaf 5')
+        sage: node_3 = EFG_Node({'C': leaf_3, 'D': leaf_4}, "Node 3", player = player_1)
+        sage: node_2 = EFG_Node({'A': leaf_1, 'B': leaf_2}, "Node 2",  player = player_2)
+        sage: node_1 = EFG_Node({'A': leaf_5, 'B': node_3}, "Node 1", player = player_2)
+        sage: root = EFG_Node({'E': node_1, 'F': node_2}, "Root", player = player_1)
+        sage: egame = ExtensiveFormGame(root)
+        sage: egame._grow_player_tree_dictionary()
+        {root: node_3}
+        sage: egame._grow_player_tree_dictionary()
+        {node_1:, node_2}
+        """
+
+        all_player_tree_dictionary = {}
+        for player in self.players:
+            single_player_dict = {}
+            test_list = [node for node in self.tree_dictionary if node.player is player]
+            filtered_node_list = [node for node in test_list if node.is_terminal() is False]
+            for node in filtered_node_list:
+                single_player_node_list = []
+                node_values = [value for value in self.tree_dictionary[node] if isinstance(value, EFG_Node)]
+                new_node_values = []
+                while node_values:
+                    new_node_values = []
+                    for value in node_values:                                          
+                        if value.player is not player and not value.is_terminal():
+                            value_2_list = [value_2 for value_2 in self.tree_dictionary[value] if isinstance(value_2, EFG_Node)]
+                            for value_2 in value_2_list:
+                                new_node_values.append(value_2)
+                        elif value.player is player:
+                            single_player_node_list.append(value)
+                    node_values = new_node_values
+                single_player_dict[node] = single_player_node_list
+            all_player_tree_dictionary[player] = single_player_dict
+        return filtered_node_list
+        return all_player_tree_dictionary
+
+
 class EFG_Node():
     def __init__(self, node_input, name=False, player=False):
         """
