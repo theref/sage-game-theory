@@ -578,7 +578,28 @@ generate a random game with utilities given over a particular field::
     )
 
 The above takes the ring as the argument and a tuple showing the number of
-strategies for each player.
+strategies for each player. By default this game returns games that may be
+degenerate however it is possible to specify if this is required::
+
+    sage: g = random_nfg(ZZ, (3, 3), degenerate=False)
+    sage: g.payoff_matrices()
+    (
+    [    2 -1955    -1]  [   3  -22    2]
+    [    1    18     0]  [   0   -2   28]
+    [    1    -1    -4], [-357   -1   -2]
+    )
+    sage: g.is_degenerate()
+    False
+
+    sage: g = random_nfg(ZZ, (3, 3), degenerate=True)
+    sage: g.payoff_matrices()
+    (
+    [ 0 -2 -1]  [-1  0 -2]
+    [ 0 27  1]  [ 0 -1  1]
+    [ 0 -1 -1], [ 2  1 -2]
+    )
+    sage: g.is_degenerate()
+    True
 
 Several standard Normal Form Games have also been implemented.
 For more information on how to access these, see:
@@ -2305,7 +2326,7 @@ class _Player():
         self.num_strategies += 1
 
 
-def random_nfg(ring, number_of_strategies):
+def random_nfg(ring, number_of_strategies, degenerate=None):
     r"""
     Returns a random N player normal form game with payoffs matrices in the
     specified ring and with number of strategies specified by the
@@ -2317,6 +2338,9 @@ def random_nfg(ring, number_of_strategies):
 
     -  ``number_of_strategies`` - Tuple; number of strategies available to each
        player.
+
+    -  ``degenerate`` - Boolean, None; specify if the random game should be
+       degenerate or not. By default this is ``None`` so not constrained.
 
     EXAMPLES:
 
@@ -2403,11 +2427,64 @@ def random_nfg(ring, number_of_strategies):
         sage: g = random_nfg(ZZ, (1, 1, 1, 1, 1, 1))
         sage: g
         Normal Form Game with the following utilities: {(0, 0, 0, 0, 0, 0): [-1, -13, 1, 2, 3, 0]}
+
+    We can pass an extra parameter to ensure that the game we want is degenerate
+    or not (this is useful for demonstration purposes)::
+
+        sage: g = random_nfg(ZZ, (3, 3), degenerate=False)
+        sage: g.payoff_matrices()
+        (
+        [-1  0 -1]  [ 1 -1  2]
+        [94 -1 -2]  [ 1  2 -2]
+        [ 1 -1  1], [ 6 -1 -3]
+        )
+        sage: g.is_degenerate()
+        False
+
+        sage: g = random_nfg(ZZ, (3, 3), degenerate=True)
+        sage: g.payoff_matrices()
+        (
+        [ 1  1  1]  [-1  0 -1]
+        [-3  0 -1]  [-3  0  1]
+        [-1 -1 -1], [-2  1  1]
+        )
+        sage: g.is_degenerate()
+        True
+
+    By default this parameter is set to ``None`` and so it is possible to
+    return both games that are degenerate or not::
+
+        sage: games = [random_nfg(ZZ, (3, 3)) for k in range(5)]
+        sage: True in [g.is_degenerate() for g in games]
+        True
+        sage: False in [g.is_degenerate() for g in games]
+        True
+
+    At present, a test for degeneracy is only implemented for 2 player games::
+
+        sage: g = random_nfg(ZZ, (1, 1, 1), degenerate=True)
+        Traceback (most recent call last):
+        ...
+        ValueError: Degeneracy testing is only implemented for 2 player games.
+        sage: g = random_nfg(ZZ, (1, 1, 1), degenerate=False)
+        Traceback (most recent call last):
+        ...
+        ValueError: Degeneracy testing is only implemented for 2 player games.
     """
+    if degenerate is not None and len(number_of_strategies) != 2:
+        raise ValueError("Degeneracy testing is only implemented for 2 player games.")
+
     g = NormalFormGame()
     for number in number_of_strategies:
         g.add_player(number)
     for profile in CartesianProduct(*[range(number) for number in
-        number_of_strategies]):
-        g[tuple(profile)] = [ring.random_element() for player in number_of_strategies]
-    return g
+                                    number_of_strategies]):
+        g[tuple(profile)] = [ring.random_element() for
+                             player in number_of_strategies]
+
+    if degenerate is None:
+        return g
+
+    if g.is_degenerate() == degenerate:
+        return g
+    return random_nfg(ring, number_of_strategies, degenerate)
