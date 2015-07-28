@@ -512,7 +512,7 @@ generate a random game with utilities given over a particular field::
 
     sage: g = random_nfg(ZZ, (3, 3))
     sage: g
-    Normal Form Game with the following utilities: {(0, 1): [1, -95], (1, 2): [-1, 1], (0, 0): [-1, 2], (2, 1): [-1, 4], (1, 1): [0, 1], (2, 0): [-1, -2], (2, 2): [-4, -6], (1, 0): [-12, 0], (0, 2): [-1, -2]}
+    Normal Form Game with the following utilities: ...
     sage: g.payoff_matrices()
     (
     [ -1   1  -1]  [  2 -95  -2]
