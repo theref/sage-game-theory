@@ -507,6 +507,22 @@ For example::
     sage: g.obtain_nash()
     [[(0, 1), (0, 1)]]
 
+For demonstration and/or research purposes it might be useful to be able to
+generate a random game with utilities given over a particular field::
+
+    sage: g = random_nfg(ZZ, (3, 3))
+    sage: g
+    Normal Form Game with the following utilities: {(0, 1): [1, -95], (1, 2): [-1, 1], (0, 0): [-1, 2], (2, 1): [-1, 4], (1, 1): [0, 1], (2, 0): [-1, -2], (2, 2): [-4, -6], (1, 0): [-12, 0], (0, 2): [-1, -2]}
+    sage: g.payoff_matrices()
+    (
+    [ -1   1  -1]  [  2 -95  -2]
+    [-12   0  -1]  [  0   1   1]
+    [ -1  -1  -4], [ -2   4  -6]
+    )
+
+The above takes the ring as the argument and a tuple showing the number of
+strategies for each player.
+
 REFERENCES:
 
 .. [N1950] John Nash.
@@ -555,6 +571,7 @@ from sage.misc.misc import powerset
 from sage.rings.all import QQ
 from sage.structure.sage_object import SageObject
 from sage.matrix.constructor import matrix
+from sage.matrix.constructor import random_matrix
 from sage.matrix.constructor import vector
 from sage.misc.package import is_package_installed
 from sage.misc.temporary_file import tmp_filename
@@ -1816,3 +1833,111 @@ class _Player():
             6
         """
         self.num_strategies += 1
+
+
+def random_nfg(ring, number_of_strategies):
+    r"""
+    Returns a random N player normal form game with payoffs matrices in the
+    specified ring and with number of strategies specified by the
+    ``number_of_strategies`` tuple.
+
+    INPUT:
+
+    -  ``ring`` - base ring for entries of the matrix
+
+    -  ``number_of_strategies`` - Tuple; number of strategies available to each
+       player.
+
+    EXAMPLES:
+
+    Here is a basic random 5 by 5 bi matrix game::
+
+        sage: g = random_nfg(ZZ, (5, 5))
+        sage: g.payoff_matrices()
+        (
+        [ -8   0   1   2 -95]  [  2   0  -1   1  -1]
+        [ -2   0   1   1  -2]  [-12   0  -1  -1  -1]
+        [  4  -6   0  -2   1]  [ -4   5   0   0  -4]
+        [ -6  -1   1   1  -3]  [  1   1  -1  -1   1]
+        [  1   0   2   0   1], [  0  -3  -2  -2   0]
+        )
+        sage: g.obtain_nash()
+        [[(0, 0, 0, 0, 1), (0, 0, 0, 0, 1)],
+         [(0, 0, 1/4, 0, 3/4), (0, 0, 0, 0, 1)],
+         [(0, 0, 1/4, 0, 3/4), (2/3, 1/3, 0, 0, 0)],
+         [(0, 3/4, 0, 0, 1/4), (0, 1, 0, 0, 0)],
+         [(0, 1, 0, 0, 0), (0, 1, 0, 0, 0)],
+         [(1/4, 1/2, 0, 0, 1/4), (0, 1, 0, 0, 0)],
+         [(1/2, 1/2, 0, 0, 0), (0, 1, 0, 0, 0)],
+         [(11/12, 1/12, 0, 0, 0), (1/7, 0, 0, 6/7, 0)]]
+
+    We can create a random game with differing sizes of strategies::
+
+        sage: g = random_nfg(ZZ, (2, 6))
+        sage: g.payoff_matrices()
+        (
+        [-1  0  1  4  1 14]  [ 1  0 -1 -1 -1  1]
+        [-5 -1  2  1 -2  0], [ 4  0  4  1 -1  4]
+        )
+        sage: g.obtain_nash()
+        [[(0, 1), (0, 0, 14/15, 0, 0, 1/15)],
+         [(0, 1), (0, 0, 1, 0, 0, 0)],
+         [(0, 1), (1/5, 0, 4/5, 0, 0, 0)],
+         [(1, 0), (0, 0, 0, 0, 0, 1)],
+         [(1, 0), (1, 0, 0, 0, 0, 0)]]
+
+    It is possible to create games that have utilities that are not in ZZ::
+
+        sage: g = random_nfg(QQ, (3, 3))
+        sage: g.payoff_matrices()
+        (
+        [     -3     1/9     3/2]  [   5/2      1     -1]
+        [   -1/2    -2/7 -3/1955]  [    -1    1/2     22]
+        [      2   -1/14       1], [     0 -1/357      2]
+        )
+        sage: g.obtain_nash()
+        [[(4/11, 0, 7/11), (1/11, 0, 10/11)]]
+
+    We can easily create a random game with more than 2 players::
+
+        sage: g = random_nfg(ZZ, (4, 2, 3))
+        sage: g
+        Normal Form Game with the following utilities: ...
+        sage: expected_utilities = {(0, 0, 0): [0, -1, -2],
+        ....:                       (0, 0, 1): [0, -1, -2],
+        ....:                       (0, 0, 2): [0, 0, 27],
+        ....:                       (0, 1, 0): [-1, 1, 1],
+        ....:                       (0, 1, 1): [0, 2, -1],
+        ....:                       (0, 1, 2): [1, -1, -2],
+        ....:                       (1, 0, 0): [-1, 3, 2],
+        ....:                       (1, 0, 1): [-2, -1, -4],
+        ....:                       (1, 0, 2): [2, 1, 2],
+        ....:                       (1, 1, 0): [1, -2, 0],
+        ....:                       (1, 1, 1): [0, 1, -2],
+        ....:                       (1, 1, 2): [-2, -2, 0],
+        ....:                       (2, 0, 0): [2, 0, 1],
+        ....:                       (2, 0, 1): [1, 1, 1],
+        ....:                       (2, 0, 2): [-1, -2, 0],
+        ....:                       (2, 1, 0): [-1, 2, -1],
+        ....:                       (2, 1, 1): [1, -27, 2],
+        ....:                       (2, 1, 2): [5, 1, -10],
+        ....:                       (3, 0, 0): [2, -1, -1],
+        ....:                       (3, 0, 1): [-2, 2, -4],
+        ....:                       (3, 0, 2): [0, 0, 0],
+        ....:                       (3, 1, 0): [-1, -1, 1],
+        ....:                       (3, 1, 1): [-4, 0, 3],
+        ....:                       (3, 1, 2): [2, 1, 0]}
+        sage: g.utilities  == expected_utilities  # Testing the equality of utilities as ordering of dictionaries is system dependent.
+        True
+
+        sage: g = random_nfg(ZZ, (1, 1, 1, 1, 1, 1))
+        sage: g
+        Normal Form Game with the following utilities: {(0, 0, 0, 0, 0, 0): [-1, -13, 1, 2, 3, 0]}
+    """
+    g = NormalFormGame()
+    for number in number_of_strategies:
+        g.add_player(number)
+    for profile in CartesianProduct(*[range(number) for number in
+        number_of_strategies]):
+        g[tuple(profile)] = [ring.random_element() for player in number_of_strategies]
+    return g
